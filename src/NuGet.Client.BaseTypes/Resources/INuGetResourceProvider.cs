@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace NuGet.Client
 {
-    public interface IResourceProviderMetadata
+    public interface INuGetResourceProvider
     {
-         string ProviderName { get;} 
-         Type ResourceType { get;} 
-    }     
+        bool TryCreate(SourceRepository source, out INuGetResource resource);
+    }
 }

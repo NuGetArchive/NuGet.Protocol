@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NuGet.Client.VisualStudio.Models
+namespace NuGet.Client.VisualStudio
 {
-    public sealed class VisualStudioUIPackageMetadata 
+    public sealed class UIPackageMetadata 
     {
-        public VisualStudioUIPackageMetadata(string title,IEnumerable<string> authors,IEnumerable<string> owners,Uri iconUrl, Uri licenseUrl,Uri projectUrl,bool requiresLiceneseAcceptance,string description,string summary,string releaseNotes,string language,string tags,string copyright,Version minClientVersion)
+        public UIPackageMetadata(string title,IEnumerable<string> authors,IEnumerable<string> owners,Uri iconUrl, Uri licenseUrl,Uri projectUrl,bool requiresLiceneseAcceptance,string description,string summary,string releaseNotes,string language,string tags,string copyright,Version minClientVersion)
         {
             Title = title;
             Authors = authors;

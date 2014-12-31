@@ -1,5 +1,5 @@
 ﻿using NuGet.Client.V3;
-using NuGet.Client.VisualStudio.Models;
+using NuGet.Client.VisualStudio;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
@@ -9,17 +9,18 @@ using System.Threading.Tasks;
 
 namespace NuGet.Client.V3.VisualStudio
 {
-    [Export(typeof(ResourceProvider))]
-    [ResourceProviderMetadata("VsV3SearchResourceProvider", typeof(IVsSearch))]
-    public class VsV3SearchResourceProvider : V3ResourceProvider
+    [Export(typeof(INuGetResourceProvider))]
+    [ResourceProviderMetadata(typeof(UISearch))]
+    public class VsV3SearchResourceProvider : INuGetResourceProvider
     {
-        public async override Task<Resource> Create(PackageSource source)
+        public VsV3SearchResourceProvider()
         {
-            VsV3SearchResource vsV3SearchResource;
-            Resource resource = await base.Create(source);            
-            vsV3SearchResource = new VsV3SearchResource((V3Resource)resource);
-            resource = vsV3SearchResource;
-            return resource;
+
+        }
+
+        public bool TryCreate(SourceRepository source, out INuGetResource resource)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NuGet.Client.VisualStudio.Models
+namespace NuGet.Client.VisualStudio
 {
     /// <summary>
     /// Model for search results shown by PowerShell console search.

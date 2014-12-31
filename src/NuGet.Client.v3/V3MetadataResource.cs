@@ -3,22 +3,26 @@ using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NuGet.Client.V3
+namespace NuGet.Client
 {
-    public class V3MetadataResource :V3Resource,IMetadata
+    public class V3MetadataResource : MetadataResource
     {
-        public V3MetadataResource(V3Resource v3Resource) : base(v3Resource) { }
-        public async Task<Versioning.NuGetVersion> GetLatestVersion(string packageId)
+        public V3MetadataResource(HttpClient client, PackageSource source)
+            : base()
         {
-            IEnumerable<JObject> packages = await V3Client.GetPackageMetadataById(packageId);
-            packages = packages.OrderByDescending(p => p["version"]);
-            return new NuGetVersion((string)packages.FirstOrDefault()["version"]);           
+
         }
 
-        public Task<bool> IsSatellitePackage(string packageId)
+        public override Task<IEnumerable<NuGetVersion>> GetLatestVersions(IEnumerable<string> packageIds, bool includePrerelease = false, bool includeUnlisted = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IEnumerable<KeyValuePair<string, bool>>> IsSatellitePackage(IEnumerable<string> packageId)
         {
             throw new NotImplementedException();
         }

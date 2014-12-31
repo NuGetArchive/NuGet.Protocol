@@ -1,27 +1,41 @@
-﻿using System;
+﻿using NuGet.Data;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NuGet.Client.V3
+namespace NuGet.Client
 {
-    [Export(typeof(ResourceProvider))]
-    [ResourceProviderMetadata("V3DownloadResourceProvider", typeof(IDownload))]
-    public class V3DownloadResourceProvider : V3ResourceProvider
+    [Export(typeof(INuGetResourceProvider))]
+    [ResourceProviderMetadata(typeof(DownloadResource))]
+    public class V3DownloadResourceProvider : INuGetResourceProvider
     {
-        public async override Task<Resource> Create(PackageSource source)
+        private readonly ConcurrentDictionary<PackageSource, DownloadResource> _cache;
+
+        public V3DownloadResourceProvider()
         {
-            V3DownloadResource v3DownloadResource;
-            Resource resource = await base.Create(source);
-            if (resource != null)
+            _cache = new ConcurrentDictionary<PackageSource, DownloadResource>();
+        }
+
+        public bool TryCreate(SourceRepository source, out INuGetResource resource)
+        {
+            DownloadResource downloadResource = null;
+
+            if (V3Utilities.IsV3(source.Source))
             {
-                v3DownloadResource = new V3DownloadResource((V3Resource)resource);
-                resource = v3DownloadResource;
+                if (!_cache.TryGetValue(source.Source, out downloadResource))
+                {
+                    downloadResource = new V3DownloadResource(new DataClient(), source.Source);
+
+                    _cache.TryAdd(source.Source, downloadResource);
+                }
             }
-            return resource;
-           
+
+            resource = downloadResource;
+            return downloadResource != null;
         }
     }
 }

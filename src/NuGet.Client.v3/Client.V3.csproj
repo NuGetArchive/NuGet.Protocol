@@ -7,8 +7,8 @@
     <ProjectGuid>{72B86845-F376-4884-A0F2-AD3473CCEBED}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NuGet.Client.V3</RootNamespace>
-    <AssemblyName>NuGet.Client.V3</AssemblyName>
+    <RootNamespace>NuGet.Client</RootNamespace>
+    <AssemblyName>NuGet.Client</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>68c79dcd</NuGetPackageImportStamp>
@@ -38,17 +38,22 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Client.BaseTypes, Version=0.1.0.0, Culture=neutral, PublicKeyToken=a54e26fdc1b81123, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Client.BaseTypes, Version=0.1.0.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Client.BaseTypes.0.1.8-master-1230\lib\net45\NuGet.Client.BaseTypes.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Client.BaseTypes.0.1.0-clean-43652357\lib\net45\NuGet.Client.BaseTypes.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Data, Version=1.0.1.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Data.1.0.1-master-43391912\lib\net45\NuGet.Data.dll</HintPath>
+    <Reference Include="NuGet.Frameworks">
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.Frameworks.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Versioning, Version=1.0.3.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Packaging">
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.PackagingCore">
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.PackagingCore.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Versioning, Version=1.0.5.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Versioning.1.0.3\lib\portable-net40+win\NuGet.Versioning.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Versioning.1.0.5\lib\portable-net40+win\NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -72,7 +77,6 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NuGetProtocolException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="NuGetV3Client.cs" />
     <Compile Include="Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -82,8 +86,6 @@
     <Compile Include="V3DownloadResourceProvider.cs" />
     <Compile Include="V3MetadataResource.cs" />
     <Compile Include="V3MetadataResourceProvider.cs" />
-    <Compile Include="V3Resource.cs" />
-    <Compile Include="V3ResourceProvider.cs" />
     <Compile Include="V3Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +97,12 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataClient\Data.csproj">
+      <Project>{7e69cb0e-4819-45fe-ab28-11efb81f81c0}</Project>
+      <Name>Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

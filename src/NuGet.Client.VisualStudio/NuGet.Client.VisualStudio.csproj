@@ -34,13 +34,22 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Client.BaseTypes, Version=0.1.0.0, Culture=neutral, PublicKeyToken=a54e26fdc1b81123, processorArchitecture=MSIL">
+    <Reference Include="NuGet.Client.BaseTypes, Version=0.1.0.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Client.BaseTypes.0.1.8-master-1230\lib\net45\NuGet.Client.BaseTypes.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Client.BaseTypes.0.1.0-clean-43652357\lib\net45\NuGet.Client.BaseTypes.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Versioning, Version=1.0.3.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NuGet.Versioning.1.0.3\lib\portable-net40+win\NuGet.Versioning.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NuGet.Frameworks">
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.Frameworks.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Packaging">
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.PackagingCore">
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.PackagingCore.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Versioning, Version=1.0.5.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NuGet.Versioning.1.0.5\lib\portable-net40+win\NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -52,15 +61,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\IPowerShellAutoComplete.cs" />
+    <Compile Include="PowerShellAutoComplete.cs" />
     <Compile Include="Models\PowershellSearchMetadata.cs" />
-    <Compile Include="Models\VisualStudioUIPackageMetadata.cs" />
-    <Compile Include="Models\VisualStudioUISearchMetadata.cs" />
-    <Compile Include="Models\IVsMetadata.cs" />
-    <Compile Include="Models\IVsSearch.cs" />
+    <Compile Include="Models\UIPackageMetadata.cs" />
+    <Compile Include="Models\UISearchMetadata.cs" />
+    <Compile Include="Models\UIMetadataResource.cs" />
+    <Compile Include="UISearch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
