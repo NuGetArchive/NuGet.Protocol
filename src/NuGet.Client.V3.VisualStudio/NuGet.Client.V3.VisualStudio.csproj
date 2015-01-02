@@ -50,7 +50,6 @@
     <Reference Include="NuGet.Client.VisualStudio, Version=0.1.3.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NuGet.Client.VisualStudio.0.1.3-a20141231204717-158\lib\net45\NuGet.Client.VisualStudio.dll</HintPath>
       <Private>True</Private>
-    </Reference>
     <Reference Include="NuGet.Data, Version=1.0.1.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\NuGet.Data.1.0.1-master-43391912\lib\net45\NuGet.Data.dll</HintPath>
@@ -80,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VsV3MetadataResource.cs" />
     <Compile Include="VsV3SearchResource.cs" />
     <Compile Include="VsV3SearchResourceProvider.cs" />
   </ItemGroup>
