@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace NuGet.Client.VisualStudio.Models
 {
-    public interface IVsMetadata
+    public interface IVisualStudioUIMetadata
     {
-       VisualStudioUIPackageMetadata GetPackageMetadataForVisualStudioUI(string packageId, NuGetVersion version);
+       Task<VisualStudioUIPackageMetadata> GetPackageMetadataForVisualStudioUI(string packageId, NuGetVersion version);
     }
 }

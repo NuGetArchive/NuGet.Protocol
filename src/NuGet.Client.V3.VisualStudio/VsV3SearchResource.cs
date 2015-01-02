@@ -95,8 +95,5 @@ namespace NuGet.Client.V3.VisualStudio
             }
             return new Uri(str);
         }
-
-
-     
     }
 }
