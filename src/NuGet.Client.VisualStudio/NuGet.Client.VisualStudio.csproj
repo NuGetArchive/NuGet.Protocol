@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\IPowerShellAutoComplete.cs" />
+    <Compile Include="Models\IPowerShellSearch.cs" />
     <Compile Include="Models\PowershellSearchMetadata.cs" />
     <Compile Include="Models\VisualStudioUIPackageDependency.cs" />
     <Compile Include="Models\VisualStudioUIPackageDependencySet.cs" />
