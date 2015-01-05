@@ -17,12 +17,11 @@ namespace NuGet.Client
     /// Represents a Server endpoint. Exposes methods to get a specific resource like Search resoure, Metrics service and so on for the given server endpoint.
     /// This will be the replacement for existing SourceRepository class.
     /// </summary>  
-    public class SourceRepository
+    public sealed class SourceRepository
     {
-        private IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> _providers { get; set; }
+        private readonly IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> _providers;
         private readonly PackageSource _source;
 
-        //*TODOs: Providers should be automatically imported when run inside vs context. Right now passing triggering it as part of testapp and passing it as param.
         public SourceRepository(PackageSource source, IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> providers)
         {
             _source = source;
@@ -45,14 +44,15 @@ namespace NuGet.Client
         /// </summary>
         /// <typeparam name="T">Expected resource type</typeparam>
         /// <returns>Null if the resource does not exist</returns>
-        public async Task<T> GetResource<T>() 
+        public T GetResource<T>()
         {
+            Type resourceType = typeof(T);
             INuGetResource resource = null;
 
             foreach (Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata> provider in _providers)
             {
-                //Each provider will expose the "ResourceType" that it can create. Filter the provider based on the current "resourceType" that is requested and invoke TryCreateResource on it.
-                if (provider.Metadata.ResourceType == typeof(T))
+                // return the first provider we find whose output is the requested type, or whose output derives from the type.
+                if (resourceType == provider.Metadata.ResourceType || resourceType.IsSubclassOf(provider.Metadata.ResourceType))
                 {
                     if (provider.Value.TryCreate(this, out resource))
                     {
@@ -62,12 +62,17 @@ namespace NuGet.Client
                 }
             }
 
-            if (resource != null)
-            {
-                return (T)resource;
-            }
+            return resource == null ? default(T) : (T)resource;
+        }
 
-            return default(T);
+        /// <summary>
+        /// Returns a resource from the SourceRepository if it exists.
+        /// </summary>
+        /// <typeparam name="T">Expected resource type</typeparam>
+        /// <returns>Null if the resource does not exist</returns>
+        public async Task<T> GetResourceAsync<T>() 
+        {
+            return await Task.Run(() => GetResource<T>());
         }
     }
 }
