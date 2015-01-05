@@ -13,7 +13,7 @@ namespace NuGet.Client
     /// Retrieves all dependency info for the package resolver.
     /// </summary>
     [Export(typeof(INuGetResourceProvider))]
-    [ResourceProviderMetadata(typeof(DownloadResource))]
+    [ResourceProviderMetadata(typeof(DepedencyInfoResource))]
     public class V3DependencyInfoResourceProvider : INuGetResourceProvider
     {
         private readonly DataClient _client;
@@ -36,7 +36,7 @@ namespace NuGet.Client
             if (source.GetResource<V3ServiceIndexResource>() != null)
             {
                 // construct a new resource
-                resource = new V3DependencyInfoResource(_client);
+                dependencyInfoResource = new V3DependencyInfoResource(_client);
             }
 
             resource = dependencyInfoResource;

@@ -19,13 +19,13 @@ namespace NuGet.Client
     /// </summary>  
     public sealed class SourceRepository
     {
-        private readonly IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> _providers;
+        private readonly Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>[] _providers;
         private readonly PackageSource _source;
 
         public SourceRepository(PackageSource source, IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> providers)
         {
             _source = source;
-            _providers = providers;
+            _providers = providers.ToArray();
         }
 
         /// <summary>
