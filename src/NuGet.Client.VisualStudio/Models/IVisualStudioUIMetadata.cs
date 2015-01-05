@@ -10,5 +10,6 @@ namespace NuGet.Client.VisualStudio.Models
     public interface IVisualStudioUIMetadata
     {
        Task<VisualStudioUIPackageMetadata> GetPackageMetadataForVisualStudioUI(string packageId, NuGetVersion version);
+       Task<IEnumerable<VisualStudioUIPackageMetadata>> GetPackageMetadataForAllVersionsForVisualStudioUI(string packageId);
     }
 }

@@ -82,6 +82,10 @@ namespace V2V3ResourcesTest
             Assert.True(packageMetadata.HasDependencies.Equals(true)); 
             Assert.True(packageMetadata.DependencySets.Count() == 1);
             Assert.True(packageMetadata.DependencySets.First().Dependencies.Count().Equals(12));
+
+            IEnumerable<VisualStudioUIPackageMetadata> packageMetadataList = resource.GetPackageMetadataForAllVersionsForVisualStudioUI("Nuget.core").Result;
+            Assert.True(packageMetadataList != null);
+            Assert.True(packageMetadataList.Count() == 40);
             
         }
 

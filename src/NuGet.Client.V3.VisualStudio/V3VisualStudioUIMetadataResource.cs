@@ -24,6 +24,12 @@ namespace NuGet.Client.V3.VisualStudio
            return GetVisualstudioPackageMetadata(metatdata);           
         }
 
+        public async Task<IEnumerable<VisualStudioUIPackageMetadata>> GetPackageMetadataForAllVersionsForVisualStudioUI(string packageId)
+        {
+          IEnumerable<JObject> metadataList =  await V3Client.GetPackageMetadataById(packageId);
+          return metadataList.Select(item => GetVisualstudioPackageMetadata(item));
+        }
+
         private VisualStudioUIPackageMetadata GetVisualstudioPackageMetadata(JObject metadata)
         {
            
@@ -92,6 +98,7 @@ namespace NuGet.Client.V3.VisualStudio
         }
 
         #region CopiedFromCoreVersionUtility
+        //Temporarily copied from version utility. This need to be moved to the right package (NuGet.Versioning).
         private static FrameworkName ParseFrameworkName(string frameworkName)
         {
             if (frameworkName == null)
@@ -318,5 +325,7 @@ namespace NuGet.Client.V3.VisualStudio
         private const string GreaterThanOrEqualTo = "\u2265";
 
         #endregion CopiedFromCoreVersionUtility
+
+       
     }
 }
