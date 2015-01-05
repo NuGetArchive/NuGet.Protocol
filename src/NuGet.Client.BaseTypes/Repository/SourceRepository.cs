@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NuGet.Configuration;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
