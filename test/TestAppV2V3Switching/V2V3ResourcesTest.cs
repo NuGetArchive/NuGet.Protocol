@@ -16,11 +16,12 @@ using Xunit;
 
 namespace V2V3ResourcesTest
 {
-    public class V3ResourceTest
+    public class V2V3ResourcesTest
     {
         private CompositionContainer container;
         private string V3SourceUrl = "https://az320820.vo.msecnd.net/ver3-preview/index.json";
-        public V3ResourceTest()
+        private string V2SourceUrl = "https://nuget.org";
+        public V2V3ResourcesTest()
         {
             try
             {
@@ -28,7 +29,7 @@ namespace V2V3ResourcesTest
                 var aggregateCatalog = new AggregateCatalog();
                 //Build the directory path where the parts will be available
                 var directoryPath = Environment.CurrentDirectory;
-                var directoryCatalog = new DirectoryCatalog(directoryPath, "*V3*.dll");
+                var directoryCatalog = new DirectoryCatalog(directoryPath, "*NuGet.Client*.dll");
                 aggregateCatalog.Catalogs.Add(directoryCatalog);
                 container = new CompositionContainer(aggregateCatalog);
                 container.ComposeParts(this);
@@ -39,43 +40,40 @@ namespace V2V3ResourcesTest
             }
         }
 
-        [Fact]
-        public void TestV3DownloadResource()
+        [Theory]
+        [InlineData("https://nuget.org")]
+        [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
+        public void TestDownloadResource(string SourceUrl)
         {
-            IEnumerable<Lazy<ResourceProvider, IResourceProviderMetadata>> providers = container.GetExports<ResourceProvider, IResourceProviderMetadata>();
-            Assert.True(providers.Count() > 0);    
-            PackageSource source = new PackageSource("V3Source", V3SourceUrl);
-            SourceRepository2 repo = new SourceRepository2(source,providers);
+            SourceRepository2 repo = GetSourceRepository(SourceUrl);
             IDownload resource = (IDownload)repo.GetResource<IDownload>().Result;
             Assert.True(resource != null);
-            Assert.True(resource.GetType().GetInterfaces().Contains(typeof(IDownload)));
+            Assert.True(resource.GetType().GetInterfaces().Contains(typeof(IDownload)));            
             PackageDownloadMetadata downloadMetadata = resource.GetNupkgUrlForDownload(new PackageIdentity("jQuery", new NuGetVersion("1.6.4"))).Result;
             //*TODOs: Check if the download Url ends with .nupkg. More detailed verification can be added to see if the nupkg file can be fetched from the location.
             Assert.True(downloadMetadata.NupkgDownloadUrl.OriginalString.EndsWith(".nupkg")); 
         }
 
-        [Fact]
-        public void TestV3MetadataResource()
+        [Theory]
+        [InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
+        public void TestMetadataResource(string SourceUrl)
         {
-            IEnumerable<Lazy<ResourceProvider, IResourceProviderMetadata>> providers = container.GetExports<ResourceProvider, IResourceProviderMetadata>();
-            Assert.True(providers.Count() > 0);         
-            PackageSource source = new PackageSource("V3Source", V3SourceUrl);
-            SourceRepository2 repo = new SourceRepository2(source,providers);
+            SourceRepository2 repo = GetSourceRepository(SourceUrl);
             IMetadata resource = (IMetadata)repo.GetResource<IMetadata>().Result;
             Assert.True(resource != null);
             Assert.True(resource.GetType().GetInterfaces().Contains(typeof(IMetadata)));
-            NuGetVersion latestVersion = resource.GetLatestVersion("jQuery").Result;
-            //*TODOs: Use a proper test package whose latest version is fixed instead of using jQuery.
-            Assert.True(latestVersion.ToNormalizedString().Equals("2.1.1")); 
+            NuGetVersion latestVersion = resource.GetLatestVersion("Nuget.core").Result;
+            //*TODOs: Use a proper test package whose latest version is fixed instead of using nuget.core.
+            Assert.True(latestVersion.ToNormalizedString().Contains("2.8.3")); 
         }
 
-        [Fact]
-        public void TestV3VisualStudioUIMetadataResource()
+        [Theory]
+        [InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
+        public void TestVisualStudioUIMetadataResource(string SourceUrl)
         {
-            IEnumerable<Lazy<ResourceProvider, IResourceProviderMetadata>> providers = container.GetExports<ResourceProvider, IResourceProviderMetadata>();
-            Assert.True(providers.Count() > 0);
-            PackageSource source = new PackageSource("V3Source", V3SourceUrl);
-            SourceRepository2 repo = new SourceRepository2(source, providers);
+            SourceRepository2 repo = GetSourceRepository(SourceUrl);
             IVisualStudioUIMetadata resource = (IVisualStudioUIMetadata)repo.GetResource<IVisualStudioUIMetadata>().Result;
             Assert.True(resource != null);
             Assert.True(resource.GetType().GetInterfaces().Contains(typeof(IVisualStudioUIMetadata)));
@@ -87,13 +85,12 @@ namespace V2V3ResourcesTest
             
         }
 
-        [Fact]
-        public void TestV3VisualStudioUISearchResource()
+        [Theory]
+        [InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
+        public void TestVisualStudioUISearchResource(string SourceUrl)
         {
-            IEnumerable<Lazy<ResourceProvider, IResourceProviderMetadata>> providers = container.GetExports<ResourceProvider, IResourceProviderMetadata>();
-            Assert.True(providers.Count() > 0);
-            PackageSource source = new PackageSource("V3Source", V3SourceUrl);
-            SourceRepository2 repo = new SourceRepository2(source,providers);
+            SourceRepository2 repo = GetSourceRepository(SourceUrl);
             IVisualStudioUISearch resource = (IVisualStudioUISearch)repo.GetResource<IVisualStudioUISearch>().Result;
             //Check if we are able to obtain a resource
             Assert.True(resource != null);
@@ -110,13 +107,12 @@ namespace V2V3ResourcesTest
             Assert.True(searchResults.Any(p => p.Id.Equals("Elmah", StringComparison.OrdinalIgnoreCase))); 
         }
 
-        [Fact]
-        public void TestV3PowerShellAutocompleteResourceForPackageIds()
+        [Theory]
+        [InlineData("https://nuget.org")]
+        [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
+        public void TestPowerShellAutocompleteResourceForPackageIds(string SourceUrl)
         {
-            IEnumerable<Lazy<ResourceProvider, IResourceProviderMetadata>> providers = container.GetExports<ResourceProvider, IResourceProviderMetadata>();
-            Assert.True(providers.Count() > 0);
-            PackageSource source = new PackageSource("V3Source", V3SourceUrl);
-            SourceRepository2 repo = new SourceRepository2(source, providers);
+            SourceRepository2 repo = GetSourceRepository(SourceUrl);
             IPowerShellAutoComplete resource = (IPowerShellAutoComplete)repo.GetResource<IPowerShellAutoComplete>().Result;
             //Check if we are able to obtain a resource
             Assert.True(resource != null); 
@@ -128,13 +124,11 @@ namespace V2V3ResourcesTest
             Assert.True(!searchResults.Any(p => p.IndexOf("Elmah",StringComparison.OrdinalIgnoreCase) == -1)); 
         }
 
-        [Fact]
-        public void TestV3PowerShellAutocompleteResourceForPackageVersions()
+        [Theory]       
+        [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
+        public void TestPowerShellAutocompleteResourceForPackageVersions(string SourceUrl)
         {
-            IEnumerable<Lazy<ResourceProvider, IResourceProviderMetadata>> providers = container.GetExports<ResourceProvider, IResourceProviderMetadata>();
-            Assert.True(providers.Count() > 0);
-            PackageSource source = new PackageSource("V3Source", V3SourceUrl);
-            SourceRepository2 repo = new SourceRepository2(source, providers);
+            SourceRepository2 repo = GetSourceRepository(SourceUrl);
             IPowerShellAutoComplete resource = (IPowerShellAutoComplete)repo.GetResource<IPowerShellAutoComplete>().Result;
             //Check if we are able to obtain a resource
             Assert.True(resource != null);
@@ -142,6 +136,19 @@ namespace V2V3ResourcesTest
             // Check if non zero version count is returned. *TODOS : Use a standard test packages whose version count will be fixed
             IEnumerable<NuGetVersion> versions = resource.GetAllVersions("jQuery").Result ;            
             Assert.True(versions.Count() >= 35);
-        }   
+        }
+
+        #region PrivateHelpers
+        private SourceRepository2 GetSourceRepository(string SourceUrl)
+        {
+            IEnumerable<Lazy<ResourceProvider, IResourceProviderMetadata>> providers = container.GetExports<ResourceProvider, IResourceProviderMetadata>();
+            Assert.True(providers.Count() > 0);
+            PackageSource source = new PackageSource("Source", SourceUrl);
+            SourceRepository2 repo = new SourceRepository2(source, providers);
+            return repo;
+        }
+        #endregion PrivateHelpers
+
+
     }
 }
