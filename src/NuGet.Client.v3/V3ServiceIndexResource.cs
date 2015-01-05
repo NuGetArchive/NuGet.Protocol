@@ -13,17 +13,44 @@ namespace NuGet.Client
     public class V3ServiceIndexResource : INuGetResource
     {
         private readonly JObject _index;
+        private readonly DateTime _requestTime;
 
-        public V3ServiceIndexResource(JObject index)
+        public V3ServiceIndexResource(JObject index, DateTime requestTime)
         {
             _index = index;
+            _requestTime = requestTime;
         }
 
+        /// <summary>
+        /// Raw json
+        /// </summary>
         public JObject Index
         {
             get
             {
                 return _index;
+            }
+        }
+
+        /// <summary>
+        /// Time the index was requested
+        /// </summary>
+        public DateTime RequestTime
+        {
+            get
+            {
+                return _requestTime;
+            }
+        }
+
+        /// <summary>
+        /// A list of endpoints for a service type
+        /// </summary>
+        public IList<Uri> this[string type]
+        {
+            get
+            {
+                return Index["resources"].Where(j => ((string)j["@type"]) == type).Select(o => o["@id"].ToObject<Uri>()).ToList();
             }
         }
     }

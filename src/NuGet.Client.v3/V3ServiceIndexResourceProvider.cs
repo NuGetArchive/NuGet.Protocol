@@ -35,6 +35,7 @@ namespace NuGet.Client
             _client = client;
         }
 
+        // TODO: refresh the file when it gets old
         public bool TryCreate(SourceRepository source, out INuGetResource resource)
         {
             V3ServiceIndexResource index = null;
@@ -59,7 +60,7 @@ namespace NuGet.Client
                         {
                             if (version.Major == 3)
                             {
-                                index = new V3ServiceIndexResource(json);
+                                index = new V3ServiceIndexResource(json, DateTime.UtcNow);
                             }
                         }
                     }
