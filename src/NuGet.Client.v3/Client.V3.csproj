@@ -40,16 +40,22 @@
     </Reference>
     <Reference Include="NuGet.Client.BaseTypes, Version=0.1.0.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Client.BaseTypes.0.1.0-clean-43652357\lib\net45\NuGet.Client.BaseTypes.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Client.BaseTypes.0.1.0-cleanres-50010324\lib\net45\NuGet.Client.BaseTypes.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Frameworks">
-      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.Frameworks.dll</HintPath>
+    <Reference Include="NuGet.Frameworks, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-50050213\lib\net45\NuGet.Frameworks.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Packaging">
-      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.Packaging.dll</HintPath>
+    <Reference Include="NuGet.Packaging, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-50050213\lib\net45\NuGet.Packaging.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.PackagingCore">
-      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-43652058\lib\net45\NuGet.PackagingCore.dll</HintPath>
+    <Reference Include="NuGet.PackagingCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-50050213\lib\net45\NuGet.PackagingCore.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Resolver">
+      <HintPath>..\..\packages\NuGet.Packaging.1.0.0-master-50050213\lib\net45\NuGet.Resolver.dll</HintPath>
     </Reference>
     <Reference Include="NuGet.Versioning, Version=1.0.5.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -74,6 +80,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="DependencyInfo\DependencyInfo.cs" />
+    <Compile Include="DependencyInfo\PackageInfo.cs" />
+    <Compile Include="DependencyInfo\RegistrationInfo.cs" />
+    <Compile Include="DependencyInfo\ResolverMetadataClient.cs" />
+    <Compile Include="DependencyInfo\Trim.cs" />
+    <Compile Include="DependencyInfo\Utils.cs" />
+    <Compile Include="V3DependencyInfoResourceProvider.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="NuGetProtocolException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -82,11 +95,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
+    <Compile Include="V3DependencyInfoResource.cs" />
     <Compile Include="V3DownloadResource.cs" />
     <Compile Include="V3DownloadResourceProvider.cs" />
     <Compile Include="V3MetadataResource.cs" />
     <Compile Include="V3MetadataResourceProvider.cs" />
-    <Compile Include="V3Utilities.cs" />
+    <Compile Include="V3ServiceIndexResource.cs" />
+    <Compile Include="V3ServiceIndexResourceProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

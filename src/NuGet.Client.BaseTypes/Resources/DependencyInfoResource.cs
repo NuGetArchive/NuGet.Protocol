@@ -1,4 +1,5 @@
-﻿using NuGet.PackagingCore;
+﻿using NuGet.Frameworks;
+using NuGet.PackagingCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,6 @@ namespace NuGet.Client
         /// </summary>
         /// <param name="identity"></param>
         /// <returns></returns>
-        public abstract Task<IEnumerable<PackageDependencyInfo>> ResolvePackages(IEnumerable<PackageIdentity> packages, bool includePrerelease = false);
+        public abstract Task<IEnumerable<PackageDependencyInfo>> ResolvePackages(IEnumerable<PackageIdentity> packages, NuGetFramework projectFramework, bool includePrerelease = false);
     }
 }

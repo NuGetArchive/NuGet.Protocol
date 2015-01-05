@@ -24,7 +24,7 @@ namespace NuGet.Client
         {
             DownloadResource downloadResource = null;
 
-            if (V3Utilities.IsV3(source.Source))
+            if (source.GetResource<V3ServiceIndexResource>() != null)
             {
                 if (!_cache.TryGetValue(source.Source, out downloadResource))
                 {
