@@ -1,4 +1,5 @@
-﻿using NuGet.Data;
+﻿using NuGet.Configuration;
+using NuGet.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -26,11 +27,11 @@ namespace NuGet.Client
 
             if (source.GetResource<V3ServiceIndexResource>() != null)
             {
-                if (!_cache.TryGetValue(source.Source, out downloadResource))
+                if (!_cache.TryGetValue(source.PackageSource, out downloadResource))
                 {
-                    downloadResource = new V3DownloadResource(new DataClient(), source.Source);
+                    downloadResource = new V3DownloadResource(new DataClient(), source.PackageSource);
 
-                    _cache.TryAdd(source.Source, downloadResource);
+                    _cache.TryAdd(source.PackageSource, downloadResource);
                 }
             }
 

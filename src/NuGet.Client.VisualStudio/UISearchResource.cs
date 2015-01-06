@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace NuGet.Client.VisualStudio
 {
-    public abstract class UISearch
+    public abstract class UISearchResource : INuGetResource
     {
          public abstract Task<IEnumerable<UISearchMetadata>> Search(
             string searchTerm,

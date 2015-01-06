@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace NuGet.Client.VisualStudio
 {
-    public abstract class PowerShellAutoComplete : INuGetResource
+    public abstract class PSAutoCompleteResource : INuGetResource
     {
        public abstract Task<IEnumerable<string>> GetPackageIdsStartingWith(string packageIdPrefix, bool includePrerelease=false);
 

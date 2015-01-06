@@ -32,7 +32,7 @@ namespace NuGet.Client
         /// <summary>
         /// Package source
         /// </summary>
-        public PackageSource Source
+        public PackageSource PackageSource
         {
             get
             {

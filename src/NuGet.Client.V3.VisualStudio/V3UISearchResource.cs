@@ -2,6 +2,7 @@
 using NuGet.Client;
 using NuGet.Client.V3;
 using NuGet.Client.VisualStudio;
+using NuGet.Data;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ using System.Threading.Tasks;
 
 namespace NuGet.Client.V3.VisualStudio
 {
-    public class VsV3SearchResource : UISearch
+    public class V3UISearchResource : UISearchResource
     {
-        public VsV3SearchResource()
+        public V3UISearchResource(DataClient client)
             : base()
         {
 
@@ -24,6 +25,10 @@ namespace NuGet.Client.V3.VisualStudio
 
         public override async Task<IEnumerable<UISearchMetadata>> Search(string searchTerm, SearchFilter filters, int skip, int take, CancellationToken cancellationToken)
         {
+            // TODO: get service index, retrieve search entry using fallback
+            // #2 make the search call
+            // #3 create strongly typed objects
+
             throw new NotImplementedException();
 
             //List<string> frameworkNames = new List<string>();

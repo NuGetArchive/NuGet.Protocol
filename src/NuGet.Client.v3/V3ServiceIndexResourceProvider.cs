@@ -40,7 +40,7 @@ namespace NuGet.Client
         {
             V3ServiceIndexResource index = null;
 
-            string url = source.Source.Url;
+            string url = source.PackageSource.Source;
 
             // the file type can easily rule out if we need to request the url
             if (url.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
