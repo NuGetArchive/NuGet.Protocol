@@ -209,13 +209,14 @@ namespace NuGet.Client.V3
             // Descend through the items to find all the versions
             var versions = await Descend((JArray)catalogPackage["items"]);
 
+            return versions;
             // Return the catalogEntry values
-            return versions.Select(o =>
-            {
-                var result = (JObject)o["catalogEntry"];
-                result[Properties.PackageContent] = o[Properties.PackageContent];
-                return result;
-            });
+            //return versions.Select(o =>
+            //{
+            //    var result = (JObject)o["catalogEntry"];
+            //    result[Properties.PackageContent] = o[Properties.PackageContent];
+            //    return result;
+            //});
         }
 
         #region PrivateHelpers

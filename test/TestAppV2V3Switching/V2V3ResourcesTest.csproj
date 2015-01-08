@@ -52,11 +52,11 @@
     </Reference>
     <Reference Include="NuGet.Client.V3, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Client.V3.1.0.0-a20150108073128-447\lib\net45\NuGet.Client.V3.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Client.V3.1.0.0-a20150108162503-407\lib\net45\NuGet.Client.V3.dll</HintPath>
     </Reference>
     <Reference Include="NuGet.Client.V3.VisualStudio, Version=0.1.4.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\NuGet.Client.V3.VisualStudio.0.1.4-a20150108073205-315\lib\net45\NuGet.Client.V3.VisualStudio.dll</HintPath>
+      <HintPath>..\..\packages\NuGet.Client.V3.VisualStudio.0.1.4-a20150108162518-683\lib\net45\NuGet.Client.V3.VisualStudio.dll</HintPath>
     </Reference>
     <Reference Include="NuGet.Client.VisualStudio, Version=0.1.3.0, Culture=neutral, PublicKeyToken=2e465378e3b1a8dd, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -104,6 +104,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DataClient\Data.csproj">
+      <Project>{7e69cb0e-4819-45fe-ab28-11efb81f81c0}</Project>
+      <Name>Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
