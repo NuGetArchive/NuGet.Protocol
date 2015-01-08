@@ -236,7 +236,8 @@ namespace NuGet.Client.V3
                 }
                 else if (Equals(type, "Package"))
                 {   
-                    var resolved = await _client.GetJObjectAsync(new Uri(item["catalogEntry"]["@id"].ToString()));                    
+                    var resolved = await _client.GetJObjectAsync(new Uri(item["catalogEntry"]["@id"].ToString()));
+                    resolved["packageContent"] = item["packageContent"];
                     items.Add((JObject)resolved);                  
                 }
             }

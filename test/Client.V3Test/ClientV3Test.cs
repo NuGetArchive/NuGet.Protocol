@@ -32,8 +32,9 @@ namespace Client.V3Test
         [Fact]
         public async Task TestGetPackageMetadata()
         {
-            IEnumerable<JObject> allversions = await V3Client.GetPackageMetadataById("Nuget.core");
-            Assert.True(allversions.Count() == 46);       
+            IEnumerable<JObject> allversions = await V3Client.GetPackageMetadataById("Nuget.core");         
+            Assert.True(allversions.Count() == 46);
+            string obj = (string)allversions.ToList()[0]["packageContent"];           
         }
     }
 }
