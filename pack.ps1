@@ -1,11 +1,12 @@
 param (
     [switch]$Push, 
-    [ValidateSet("debug", "release")][string]$Configuration="debug", 
+    [ValidateSet("debug", "release")][string]$Configuration="release", 
     [switch]$SkipTests, 
     [switch]$SkipBuild, 
     [string]$PFXPath,
     [switch]$Stable,
-    [Parameter(Mandatory=$True)][ValidateSet("NuGet.Client.V3", "NuGet.Client.BaseTypes", "NuGet.Client.V3.VisualStudio", "NuGet.Client.VisualStudio")][string]$Id
+    [Parameter(Mandatory=$True)][ValidateSet("NuGet.Client.V3", "NuGet.Client.BaseTypes", "NuGet.Client.V3.VisualStudio", "NuGet.Client.VisualStudio")][string]$Id,
+    [switch]$NoLock
 )
 
 # build
@@ -84,7 +85,14 @@ $version = $version.TrimEnd('0').TrimEnd('.')
 
 if (!$Stable)
 {
-    $version += "-" + $gitBranch + "-" + $now.ToString("yyyy")[3] + $now.DayOfYear.ToString("000") + $now.ToString("HHmm")
+    # prerelease labels can have a max length of 20
+    $now = [System.DateTime]::UtcNow
+    $version += "-" + $now.ToString("pre-yyyyMMddHHmmss")
+
+    if ($Configuration -eq "debug")
+    {
+        $version += "-d"
+    }
 }
 
 Write-Host "Package version: $version" -ForegroundColor Cyan
@@ -95,12 +103,18 @@ if ((Test-Path nupkgs) -eq 0) {
 }
 
 # Pack
-.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -build -OutputDirectory nupkgs -version $version
+.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version
 
 # Find the path of the nupkg we just built
 $nupkgPath = Get-ChildItem .\nupkgs -filter "*$version.nupkg" | % { $_.FullName }
 
 Write-Host $nupkgPath -ForegroundColor Cyan
+
+if (!$Stable -And !$NoLock)
+{
+    Write-Host "Locking dependencies down"
+    .\tools\NupkgLock\NupkgLock.exe "$Id.nuspec" $nupkgPath
+}
 
 if ($Push)
 {

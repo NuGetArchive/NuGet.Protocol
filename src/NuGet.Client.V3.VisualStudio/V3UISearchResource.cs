@@ -6,6 +6,7 @@ using NuGet.Data;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Text;
@@ -17,93 +18,48 @@ namespace NuGet.Client.V3.VisualStudio
 {
     public class V3UISearchResource : UISearchResource
     {
-        public V3UISearchResource(DataClient client)
+        private readonly DataClient _client;
+        private readonly Uri[] _searchEndpoints;
+
+        public V3UISearchResource(DataClient client, IEnumerable<Uri> searchEndpoints)
             : base()
         {
-
+            _client = client;
+            _searchEndpoints = searchEndpoints.ToArray();
         }
 
         public override async Task<IEnumerable<UISearchMetadata>> Search(string searchTerm, SearchFilter filters, int skip, int take, CancellationToken cancellationToken)
         {
-            // TODO: get service index, retrieve search entry using fallback
-            // #2 make the search call
-            // #3 create strongly typed objects
-
-            throw new NotImplementedException();
-
-            //List<string> frameworkNames = new List<string>();
-            //foreach (FrameworkName fx in filters.SupportedFrameworks)
-            //    //  frameworkNames.Add(VersionUtility.GetShortFrameworkName(fx));
-            //    frameworkNames.Add(fx.FullName);
-            //await V3Client.Search(searchTerm, frameworkNames, filters.IncludePrerelease, skip, take, cancellationToken);
-            //IEnumerable<JObject> searchResultJsonObjects = await V3Client.Search(searchTerm, frameworkNames, filters.IncludePrerelease, skip, take, cancellationToken);
-            //List<VisualStudioUISearchMetadata> visualStudioUISearchResults = new List<VisualStudioUISearchMetadata>();
-            //foreach (JObject searchResultJson in searchResultJsonObjects)
-            //    visualStudioUISearchResults.Add(GetVisualStudioUISearchResult(searchResultJson, filters.IncludePrerelease));
-            //return visualStudioUISearchResults;
-        }
-
-        private UISearchMetadata GetVisualStudioUISearchResult(JObject package, bool includePrerelease)
-        {
-
-            string id = package.Value<string>(Properties.PackageId);
-            NuGetVersion version = NuGetVersion.Parse(package.Value<string>(Properties.LatestVersion));
-            Uri iconUrl = GetUri(package, Properties.IconUrl);
-
-            // get other versions
-            var versionList = new List<NuGetVersion>();
-            var versions = package.Value<JArray>(Properties.Versions);
-            if (versions != null)
+            for (int i = 0; i < _searchEndpoints.Length; i++)
             {
-                if (versions[0].Type == JTokenType.String)
-                {
-                    // TODO: this part should be removed once the new end point is up and running.
-                    versionList = versions
-                        .Select(v => NuGetVersion.Parse(v.Value<string>()))
-                        .ToList();
-                }
-                else
-                {
-                    versionList = versions
-                        .Select(v => NuGetVersion.Parse(v.Value<string>("version")))
-                        .ToList();
-                }
+                var endpoint = _searchEndpoints[i];
 
-                if (!includePrerelease)
+                if (!cancellationToken.IsCancellationRequested)
                 {
-                    // remove prerelease version if includePrelease is false
-                    versionList.RemoveAll(v => v.IsPrerelease);
+                    try
+                    {
+                        JObject searchJson = await _client.GetJObjectAsync(endpoint, cancellationToken);
+
+                        if (searchJson != null)
+                        {
+
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Debug.Fail("Search failed");
+
+                        if (i == _searchEndpoints.Length - 1)
+                        {
+                            // throw on the last one
+                            throw;
+                        }
+                    }
                 }
             }
-            if (!versionList.Contains(version))
-            {
-                versionList.Add(version);
-            }
 
-            IEnumerable<NuGetVersion> nuGetVersions = versionList;
-            string summary = package.Value<string>(Properties.Summary);
-            if (string.IsNullOrWhiteSpace(summary))
-            {
-                // summary is empty. Use its description instead.
-                summary = package.Value<string>(Properties.Description);
-            }
-
-            UISearchMetadata searchResult = new UISearchMetadata(id, version, summary, iconUrl, nuGetVersions, null);
-            return searchResult;
-        }
-
-        private Uri GetUri(JObject json, string property)
-        {
-            if (json[property] == null)
-            {
-                return null;
-            }
-            string str = json[property].ToString();
-            if (String.IsNullOrEmpty(str))
-            {
-                return null;
-            }
-            return new Uri(str);
+            // TODO: localize message
+            throw new NuGetProtocolException("Unable to search");
         }
     }
 }

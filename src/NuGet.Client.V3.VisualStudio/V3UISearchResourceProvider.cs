@@ -30,11 +30,18 @@ namespace NuGet.Client.V3.VisualStudio
         public bool TryCreate(SourceRepository source, out INuGetResource resource)
         {
             V3UISearchResource curResource = null;
+            V3ServiceIndexResource serviceIndex = source.GetResource<V3ServiceIndexResource>();
 
-            if (source.GetResource<V3ServiceIndexResource>() != null)
+            if (serviceIndex != null)
             {
-                // construct a new resource
-                curResource = new V3UISearchResource(_client);
+                // TODO: take this work around out and use _serviceIndex.Index["SearchQueryService"] - this is just because the package hasn't been updated yet!
+                var endpoints = serviceIndex.Index["resources"].Where(j => ((string)j["@type"]) == "SearchQueryService").Select(o => o["@id"].ToObject<Uri>()).ToArray();
+
+                if (endpoints.Length > 0)
+                {
+                    // construct a new resource
+                    curResource = new V3UISearchResource(_client, endpoints);
+                }
             }
 
             resource = curResource;
