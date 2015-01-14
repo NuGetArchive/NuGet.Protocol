@@ -28,10 +28,21 @@ namespace NuGet.Client.V2
         }
         public override Task<IEnumerable<PackageDependencyInfo>> ResolvePackages(string packageId, Frameworks.NuGetFramework projectFramework, bool includePrerelease, System.Threading.CancellationToken token)
         {
-            throw new NotImplementedException();
+            List<Tuple<string,IVersionSpec>> packageVersions = new List<Tuple<string,IVersionSpec>>();
+            packageVersions.Add(new Tuple<string,IVersionSpec>(packageId,new VersionSpec()));
+            return Task.Run(() => GetFlattenedDependencyTree(packageVersions, new List<PackageDependencyInfo>().AsEnumerable(), projectFramework, includePrerelease, token));
         }
 
-        public IEnumerable<PackageDependencyInfo> GetFlattenedDependencyTree(IEnumerable<Tuple<string, IVersionSpec>> packages, IEnumerable<PackageDependencyInfo> dependencyInfoList, Frameworks.NuGetFramework projectFramework, bool includePrerelease, System.Threading.CancellationToken token)
+        public override Task<IEnumerable<PackageDependencyInfo>> ResolvePackages(IEnumerable<PackageIdentity> packages, Frameworks.NuGetFramework projectFramework, bool includePrerelease, System.Threading.CancellationToken token)
+        {
+            List<Tuple<string, IVersionSpec>> packageVersions = packages.Select(item => GetIdAndVersionSpec(item)).ToList();
+            return Task.Run(() => GetFlattenedDependencyTree(packageVersions,new List<PackageDependencyInfo>().AsEnumerable(), projectFramework, includePrerelease, token));
+        }
+
+     
+
+        #region PrivateHelpers
+        private IEnumerable<PackageDependencyInfo> GetFlattenedDependencyTree(IEnumerable<Tuple<string, IVersionSpec>> packages, IEnumerable<PackageDependencyInfo> dependencyInfoList, Frameworks.NuGetFramework projectFramework, bool includePrerelease, System.Threading.CancellationToken token)
         {
                List<PackageDependencyInfo> packageDependencyInfo = dependencyInfoList.ToList();
                 foreach (var package in packages)
@@ -64,10 +75,9 @@ namespace NuGet.Client.V2
         {
             return new Tuple<string, IVersionSpec>(item.Id, item.VersionSpec);
         }
-
-        public override Task<IEnumerable<PackageDependencyInfo>> ResolvePackages(IEnumerable<PackageIdentity> packages, Frameworks.NuGetFramework projectFramework, bool includePrerelease, System.Threading.CancellationToken token)
+        private Tuple<string, IVersionSpec> GetIdAndVersionSpec(PackageIdentity item)
         {
-            throw new NotImplementedException();
+            return new Tuple<string, IVersionSpec>(item.Id, new VersionSpec(new SemanticVersion(item.Version.ToNormalizedString())));
         }
 
         private NuGetFramework GetNuGetFramework(PackageDependencySet dependencySet)
@@ -84,5 +94,6 @@ namespace NuGet.Client.V2
             VersionRange versionRange = dependency.VersionSpec == null ? null : VersionRange.Parse(dependency.VersionSpec.ToString());
             return new NuGet.PackagingCore.PackageDependency(id, versionRange);
         }
+        #endregion PrivateHelpers
     }
 }

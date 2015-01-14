@@ -75,6 +75,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="V2DependencyInfoResource.cs" />
+    <Compile Include="V2DependencyInfoResourceProvider.cs" />
     <Compile Include="V2DownloadResource.cs" />
     <Compile Include="V2DownloadResourceProvider.cs" />
     <Compile Include="V2MetadataResource.cs" />

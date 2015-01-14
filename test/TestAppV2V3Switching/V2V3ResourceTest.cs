@@ -139,6 +139,22 @@ namespace V2V3ResourcesTest
             Assert.True(versions.Count() >= 35);
         }
 
+        [Theory]
+        [InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
+        public async Task TestDependencyInfoResourceForPackageWithAnyFramework(string SourceUrl)
+        {
+            SourceRepository repo = GetSourceRepository(SourceUrl);
+            DepedencyInfoResource resource = repo.GetResource<DepedencyInfoResource>();
+            //Check if we are able to obtain a resource
+            Assert.True(resource != null);          
+            List<PackageIdentity> packageIdentities = new List<PackageIdentity>();
+            //Check the dependency tree depth for a known package. Since the same test executes for both V2 and V3 source, we cna also ensure that the pre-resolver data is same for both V2 and V3.
+            packageIdentities.Add(new PackageIdentity("WebGrease",new NuGetVersion("1.6.0")));
+            IEnumerable<PackageDependencyInfo> packages = await resource.ResolvePackages(packageIdentities, NuGet.Frameworks.NuGetFramework.AnyFramework, true, new CancellationToken());
+            Assert.True(packages.Count() >= 16);
+        }
+
         #region PrivateHelpers
         private SourceRepository GetSourceRepository(string SourceUrl)
         {
