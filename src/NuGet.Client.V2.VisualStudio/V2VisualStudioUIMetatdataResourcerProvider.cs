@@ -20,15 +20,20 @@ namespace NuGet.Client.V2.VisualStudio
 
                     v2UIMetadataResource = new V2UIMetadataResource((V2Resource)resource);
                     _cache.TryAdd(source.PackageSource, v2UIMetadataResource);
+                    resource = v2UIMetadataResource;
+                    return true;
                 }
-
-                resource = v2UIMetadataResource;
-                return true;
+                else
+                {
+                    resource = null;
+                    return false;
+                }               
             }
             else
             {
-                resource = null;
-                return false;
+                resource = v2UIMetadataResource;
+                return true;
+                
             }
         }
     }

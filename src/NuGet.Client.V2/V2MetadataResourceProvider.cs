@@ -24,15 +24,19 @@ namespace NuGet.Client.V2
 
                     v2MetadataResource = new V2MetadataResource((V2Resource)resource);
                     _cache.TryAdd(source.PackageSource, v2MetadataResource);
+                    resource = v2MetadataResource;
+                    return true;
                 }
-
-                resource = v2MetadataResource;
-                return true;
+                else
+                {
+                    resource = null;
+                    return false;
+                }               
             }
             else
             {
-                resource = null;
-                return false;
+                resource = v2MetadataResource;
+                return true;
             } 
         }
     }

@@ -33,7 +33,7 @@ namespace V2V3ResourcesTest
                 var aggregateCatalog = new AggregateCatalog();
                 //Build the directory path where the parts will be available
                 var directoryPath = Environment.CurrentDirectory;
-                var directoryCatalog = new DirectoryCatalog(directoryPath, "*.dll");
+                var directoryCatalog = new DirectoryCatalog(directoryPath, "NuGet.Client*.dll");
                 aggregateCatalog.Catalogs.Add(directoryCatalog);
                 container = new CompositionContainer(aggregateCatalog);
                 container.ComposeParts(this);
@@ -45,7 +45,7 @@ namespace V2V3ResourcesTest
         }
 
         [Theory]
-        //[InlineData("https://nuget.org")]
+        [InlineData("https://nuget.org")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestDownloadResource(string SourceUrl)
         {
@@ -58,7 +58,7 @@ namespace V2V3ResourcesTest
         }
 
         [Theory]
-        //[InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://nuget.org/api/v2/")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestMetadataResource(string SourceUrl)
         {
@@ -71,7 +71,7 @@ namespace V2V3ResourcesTest
         }
 
         [Theory]
-        //[InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://nuget.org/api/v2/")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestVisualStudioUIMetadataResource(string SourceUrl)
         {
@@ -90,7 +90,7 @@ namespace V2V3ResourcesTest
         }
 
         [Theory]
-        //[InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://nuget.org/api/v2/")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestVisualStudioUISearchResource(string SourceUrl)
         {
@@ -111,7 +111,7 @@ namespace V2V3ResourcesTest
         }
 
         [Theory]
-        //[InlineData("https://nuget.org")]
+        [InlineData("https://nuget.org")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestPowerShellAutocompleteResourceForPackageIds(string SourceUrl)
         {
@@ -142,11 +142,19 @@ namespace V2V3ResourcesTest
         #region PrivateHelpers
         private SourceRepository GetSourceRepository(string SourceUrl)
         {
-            IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> providers = container.GetExports<INuGetResourceProvider, INuGetResourceProviderMetadata>();
+            try
+            {
+            IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> providers = container.GetExports<INuGetResourceProvider, INuGetResourceProviderMetadata>();           
             Assert.True(providers.Count() > 0);
             PackageSource source = new PackageSource(SourceUrl, "mysource", true);
             SourceRepository repo = new SourceRepository(source, providers);
             return repo;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
         }
         #endregion PrivateHelpers
 

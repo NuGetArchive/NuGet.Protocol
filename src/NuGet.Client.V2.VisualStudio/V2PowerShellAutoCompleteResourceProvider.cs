@@ -20,15 +20,20 @@ namespace NuGet.Client.V2.VisualStudio
 
                     v2PowerShellAutoCompleteResource = new V2PowerShellAutoCompleteResource((V2Resource)resource);
                     _cache.TryAdd(source.PackageSource, v2PowerShellAutoCompleteResource);
+                    resource = v2PowerShellAutoCompleteResource;
+                    return true;
                 }
-
-                resource = v2PowerShellAutoCompleteResource;
-                return true;
+                else
+                {
+                    resource = null;
+                    return false;
+                }
             }
             else
             {
-                resource = null;
-                return false;
+                resource = v2PowerShellAutoCompleteResource;
+                return true;
+                
             }
         }
     }

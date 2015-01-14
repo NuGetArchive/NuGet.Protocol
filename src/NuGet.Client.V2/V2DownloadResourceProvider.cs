@@ -28,15 +28,19 @@ namespace NuGet.Client.V2
 
                     v2DownloadResource = new V2DownloadResource((V2Resource)resource);
                     _cache.TryAdd(source.PackageSource, v2DownloadResource);
-                }
-            
                     resource = v2DownloadResource;
-                    return true;                
+                    return true;
+                }
+                else
+                {
+                    resource = null;
+                    return false;
+                }              
             }
             else
             {
-                resource = null;
-                return false;
+                resource = v2DownloadResource;
+                return true;    
             } 
         }
     }
