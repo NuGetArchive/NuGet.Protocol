@@ -45,7 +45,7 @@ namespace V2V3ResourcesTest
         }
 
         [Theory]
-        [InlineData("https://nuget.org")]
+        [InlineData("https://nuget.org/api/v2")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestDownloadResource(string SourceUrl)
         {
@@ -92,7 +92,7 @@ namespace V2V3ResourcesTest
         [Theory]
         [InlineData("https://nuget.org/api/v2/")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
-        public async Task TestVisualStudioUISearchResource(string SourceUrl)
+        public async Task TestAllSearchResources(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
             UISearchResource resource = repo.GetResource<UISearchResource>();
@@ -103,15 +103,24 @@ namespace V2V3ResourcesTest
             List<FrameworkName> fxNames = new List<FrameworkName>();
             fxNames.Add(new FrameworkName(".NET Framework, Version=4.0"));
             filter.SupportedFrameworks = fxNames.Select(e => e.ToString());
-            IEnumerable<UISearchMetadata> searchResults = await resource.Search("Elmah", filter, 0, 100, new System.Threading.CancellationToken());
+            string SearchTerm = "Elmah";
+            IEnumerable<UISearchMetadata> uiSearchResults = await resource.Search(SearchTerm, filter, 0, 100, new System.Threading.CancellationToken());
             // Check if non empty search result is returned.
-            Assert.True(searchResults.Count() > 0);
-            //check if there is atleast one result which has Elmah as title.
-            Assert.True(searchResults.Any(p => p.Identity.Id.Equals("Elmah", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(uiSearchResults.Count() > 0);
+            //check if there is atleast one result which has Id exactly as the search terms.
+            Assert.True(uiSearchResults.Any(p => p.Identity.Id.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase)));
+
+            PSSearchResource psResource = repo.GetResource<PSSearchResource>();
+            IEnumerable<PSSearchMetadata> psSearchResults =  await psResource.Search(SearchTerm, filter, 0, 100, new System.Threading.CancellationToken());
+            SimpleSearchResource simpleSearch = repo.GetResource<SimpleSearchResource>();
+            IEnumerable<SimpleSearchMetadata> simpleSearchResults = await simpleSearch.Search(SearchTerm, filter, 0, 100, new System.Threading.CancellationToken());
+            //Check that exact search results are returned irrespective of search resource ( UI, powershell and commandline).
+            Assert.True(uiSearchResults.Count() == psSearchResults.Count());
+            Assert.True(psSearchResults.Count() == simpleSearchResults.Count());
         }
 
         [Theory]
-        [InlineData("https://nuget.org")]
+        [InlineData("https://nuget.org/api/v2")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestPowerShellAutocompleteResourceForPackageIds(string SourceUrl)
         {
@@ -122,11 +131,12 @@ namespace V2V3ResourcesTest
             IEnumerable<string> searchResults = await resource.IdStartsWith("Elmah", true, CancellationToken.None);
             // Check if non empty search result is returned.
             Assert.True(searchResults.Count() > 0);
-            //Make sure that all the package ids contains the search term in it.
-            Assert.True(!searchResults.Any(p => p.IndexOf("Elmah", StringComparison.OrdinalIgnoreCase) == -1));
+            //Make sure that the results starts with the given prefix.
+            Assert.True(searchResults.All(p => p.StartsWith("Elmah", StringComparison.OrdinalIgnoreCase)));
         }
 
         [Theory]
+        [InlineData("https://nuget.org/api/v2")]
         [InlineData("https://az320820.vo.msecnd.net/ver3-preview/index.json")]
         public async Task TestPowerShellAutocompleteResourceForPackageVersions(string SourceUrl)
         {
@@ -135,8 +145,8 @@ namespace V2V3ResourcesTest
             //Check if we are able to obtain a resource
             Assert.True(resource != null);
             // Check if non zero version count is returned. *TODOS : Use a standard test packages whose version count will be fixed
-            IEnumerable<NuGetVersion> versions = await resource.VersionStartsWith("jQuery", string.Empty, true, CancellationToken.None);
-            Assert.True(versions.Count() >= 35);
+            IEnumerable<NuGetVersion> versions = await resource.VersionStartsWith("Nuget.core", "1", true, CancellationToken.None);
+            Assert.True(versions.Count() == 13);
         }
 
         [Theory]

@@ -32,7 +32,7 @@ namespace NuGet.Client.V2
                 if (V2Client is DataServicePackageRepository)
                 {
                     //TODOs:Not sure if there is some other standard way to get the Url from a dataservice repo. DataServicePackage has downloadurl property but not sure how to get it.
-                    return new Uri(Path.Combine(V2Client.Source, "api/v2/" + identity.Id + "." + identity.Version + ".nupkg"));
+                    return new Uri(Path.Combine(V2Client.Source,  identity.Id + "." + identity.Version + ".nupkg"));
                 }
                 else if (V2Client is LocalPackageRepository)
                 {

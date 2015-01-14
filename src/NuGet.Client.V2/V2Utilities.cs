@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using NuGet.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
+using NuGet.Versioning;
 
 namespace NuGet.Client.V2
 {
@@ -63,6 +64,17 @@ namespace NuGet.Client.V2
             System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
             var response = await client.GetAsync(address);
             return  await response.Content.ReadAsStringAsync();         
+        }
+
+        public static NuGetVersion SafeToNuGetVer(SemanticVersion semanticVersion)
+        {
+            if (semanticVersion == null)
+            {
+                return null;
+            }
+            return new NuGetVersion(
+                semanticVersion.Version,
+                semanticVersion.SpecialVersion);
         }
         
     }

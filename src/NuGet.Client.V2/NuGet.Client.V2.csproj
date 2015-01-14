@@ -82,6 +82,8 @@
     <Compile Include="V2MetadataResourceProvider.cs" />
     <Compile Include="V2Resource.cs" />
     <Compile Include="V2ResourceProvider.cs" />
+    <Compile Include="V2SimpleSearchResource.cs" />
+    <Compile Include="V2SimpleSearchResourceProvider.cs" />
     <Compile Include="V2Utilities.cs" />
   </ItemGroup>
   <ItemGroup>

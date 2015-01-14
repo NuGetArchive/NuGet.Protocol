@@ -1,40 +1,33 @@
-﻿using System;
+﻿using NuGet.PackagingCore;
+using NuGet.Versioning;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
+using System.Text;
 using System.Threading.Tasks;
-using NuGet.Client.VisualStudio;
-using NuGet.Versioning;
-using NuGet.PackagingCore;
 
-namespace NuGet.Client.V2.VisualStudio
+namespace NuGet.Client.V2
 {
-    public class V2UISearchResource : UISearchResource
+    public class V2SimpleSearchResource : SimpleSearchResource
     {
         private readonly IPackageRepository V2Client;
-        public V2UISearchResource(V2Resource resource)            
-        {
-            V2Client = resource.V2Client;
-        }
-        public V2UISearchResource(IPackageRepository repo)
+        public V2SimpleSearchResource(IPackageRepository repo)
         {
             V2Client = repo;
         }
-
-        public override Task<IEnumerable<UISearchMetadata>> Search(string searchTerm, SearchFilter filters, int skip, int take, CancellationToken cancellationToken)
+        public V2SimpleSearchResource(V2Resource resource)
         {
-            return GetSearchResultsForVisualStudioUI(searchTerm, filters, skip, take, cancellationToken);
+            V2Client = resource.V2Client;
         }
-
-        private Task<IEnumerable<UISearchMetadata>> GetSearchResultsForVisualStudioUI(string searchTerm, SearchFilter filters, int skip, int take, System.Threading.CancellationToken cancellationToken)
+        public override Task<IEnumerable<SimpleSearchMetadata>> Search(string searchTerm, SearchFilter filters, int skip, int take, System.Threading.CancellationToken cancellationToken)
         {
             return Task.Factory.StartNew(() =>
             {
                 var query = V2Client.Search(
                     searchTerm,
                     filters.SupportedFrameworks,
-                    filters.IncludePrerelease);                 
-
+                    filters.IncludePrerelease);
+             
                 // V2 sometimes requires that we also use an OData filter for latest/latest prerelease version
                 if (filters.IncludePrerelease)
                 {
@@ -56,20 +49,18 @@ namespace NuGet.Client.V2.VisualStudio
                 }
 
                 // Now apply skip and take and the rest of the party
-                return (IEnumerable<UISearchMetadata>)query
+                return (IEnumerable<SimpleSearchMetadata>)query
                     .Skip(skip)
                     .Take(take)
                     .ToList()
                     .AsParallel()
                     .AsOrdered()
-                    .Select(p => CreatePackageSearchResult(p, cancellationToken))
+                    .Select(p => CreatePackageSearchResult(p))
                     .ToList();
             }, cancellationToken);
         }
-
-        private UISearchMetadata CreatePackageSearchResult(IPackage package, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
+        private SimpleSearchMetadata CreatePackageSearchResult(IPackage package)
+        {          
             var versions = V2Client.FindPackagesById(package.Id);
             if (!versions.Any())
             {
@@ -86,9 +77,8 @@ namespace NuGet.Client.V2.VisualStudio
 
             Uri iconUrl = package.IconUrl;
             PackageIdentity identity = new PackageIdentity(id, version);
-            UISearchMetadata searchMetaData = new UISearchMetadata(identity, summary, iconUrl, nuGetVersions, null);
+            SimpleSearchMetadata searchMetaData = new SimpleSearchMetadata(identity, summary, nuGetVersions);
             return searchMetaData;
         }
-      
     }
 }
