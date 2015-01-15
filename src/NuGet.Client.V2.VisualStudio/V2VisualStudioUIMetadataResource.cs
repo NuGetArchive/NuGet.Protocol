@@ -29,7 +29,12 @@ namespace NuGet.Client.V2.VisualStudio
         {
             return Task.Factory.StartNew(() =>
             {
-                return V2Client.FindPackagesById(packageId).Select(p => GetVisualStudioUIPackageMetadata(p));
+                if (V2Client.Exists(packageId))
+                {
+                    return V2Client.FindPackagesById(packageId).Select(p => GetVisualStudioUIPackageMetadata(p));
+                }
+                else
+                    return null;
             });
         }
 
