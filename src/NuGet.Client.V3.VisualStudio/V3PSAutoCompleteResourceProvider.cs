@@ -1,16 +1,9 @@
-﻿using NuGet.Client.V3;
-using NuGet.Client.VisualStudio;
+﻿using NuGet.Client.VisualStudio;
 using NuGet.Data;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NuGet.Client.V3.VisualStudio
 {
-    
     [NuGetResourceProviderMetadata(typeof(PSAutoCompleteResource), "V3PSAutoCompleteResourceProvider", "V2PSAutoCompleteResourceProvider")]
     public class V3PSAutoCompleteResourceProvider : INuGetResourceProvider
     {
@@ -27,22 +20,21 @@ namespace NuGet.Client.V3.VisualStudio
             _client = client;
         }
 
-        public bool TryCreate(SourceRepository source, out INuGetResource resource)
+        public async Task<INuGetResource> Create(SourceRepository source)
         {
             V3PSAutoCompleteResource curResource = null;
 
-            var serviceIndex = source.GetResource<V3ServiceIndexResource>();
+            var serviceIndex = await source.GetResource<V3ServiceIndexResource>();
 
             if (serviceIndex != null)
             {
-                var regResource = source.GetResource<V3RegistrationResource>();
+                var regResource = await source.GetResource<V3RegistrationResource>();
 
                 // construct a new resource
                 curResource = new V3PSAutoCompleteResource(_client, serviceIndex, regResource);
             }
 
-            resource = curResource;
-            return resource != null;
+            return curResource;
         }
     }
 }

@@ -3,11 +3,6 @@ using NuGet.Data;
 using NuGet.Versioning;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NuGet.Client
@@ -16,7 +11,7 @@ namespace NuGet.Client
     /// Retrieves and caches service index.json files
     /// V3ServiceIndexResource stores the json, all work is done in the provider
     /// </summary>
-    
+
     [NuGetResourceProviderMetadata(typeof(V3ServiceIndexResource), "V3ServiceIndexResourceProvider", NuGetResourceProviderPositions.Last)]
     public class V3ServiceIndexResourceProvider : INuGetResourceProvider
     {
@@ -28,7 +23,7 @@ namespace NuGet.Client
         }
 
         // TODO: refresh the file when it gets old
-        public bool TryCreate(SourceRepository source, out INuGetResource resource)
+        public async Task<INuGetResource> Create(SourceRepository source)
         {
             V3ServiceIndexResource index = null;
 
@@ -40,9 +35,9 @@ namespace NuGet.Client
                 // check the cache before downloading the file
                 if (!_cache.TryGetValue(url, out index))
                 {
-                    DataClient client = new DataClient(source.GetResource<HttpHandlerResource>().MessageHandler);
+                    DataClient client = new DataClient((await source.GetResource<HttpHandlerResource>()).MessageHandler);
 
-                    JObject json = client.GetJObject(new Uri(url));
+                    JObject json = await client.GetJObjectAsync(new Uri(url));
 
                     if (json != null)
                     {
@@ -64,8 +59,7 @@ namespace NuGet.Client
                 _cache.TryAdd(url, index);
             }
 
-            resource = index;
-            return resource != null;
+            return index;
         }
     }
 }

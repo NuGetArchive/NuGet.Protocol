@@ -1,16 +1,9 @@
-﻿using NuGet.Client.V3;
-using NuGet.Client.VisualStudio;
+﻿using NuGet.Client.VisualStudio;
 using NuGet.Data;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NuGet.Client.V3.VisualStudio
 {
-    
     [NuGetResourceProviderMetadata(typeof(UIMetadataResource), "V3UIMetadataResourceProvider", "V2UIMetadataResourceProvider")]
     public class V3UIMetadataResourceProvider : INuGetResourceProvider
     {
@@ -27,20 +20,19 @@ namespace NuGet.Client.V3.VisualStudio
             _client = client;
         }
 
-        public bool TryCreate(SourceRepository source, out INuGetResource resource)
+        public async Task<INuGetResource> Create(SourceRepository source)
         {
             V3UIMetadataResource curResource = null;
 
-            if (source.GetResource<V3ServiceIndexResource>() != null)
+            if (await source.GetResource<V3ServiceIndexResource>() != null)
             {
-                var regResource = source.GetResource<V3RegistrationResource>();
+                var regResource = await source.GetResource<V3RegistrationResource>();
 
                 // construct a new resource
                 curResource = new V3UIMetadataResource(_client, regResource);
             }
 
-            resource = curResource;
-            return resource != null;
+            return curResource;
         }
     }
 }

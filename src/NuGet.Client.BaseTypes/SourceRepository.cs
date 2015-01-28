@@ -20,7 +20,7 @@ namespace NuGet.Client
         /// <param name="source">source url</param>
         /// <param name="providers">Resource providers</param>
         public SourceRepository(PackageSource source, IEnumerable<KeyValuePair<INuGetResourceProviderMetadata, INuGetResourceProvider>> providers)
-            : this (source, providers.Select(p => new Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>(() => p.Value, p.Key)))
+            : this(source, providers.Select(p => new Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>(() => p.Value, p.Key)))
         {
 
         }
@@ -71,7 +71,7 @@ namespace NuGet.Client
         /// </summary>
         /// <typeparam name="T">Expected resource type</typeparam>
         /// <returns>Null if the resource does not exist</returns>
-        public virtual T GetResource<T>()
+        public virtual async Task<T> GetResource<T>()
         {
             Type resourceType = typeof(T);
             INuGetResource resource = null;
@@ -82,7 +82,8 @@ namespace NuGet.Client
             {
                 foreach (var provider in possible)
                 {
-                    if (provider.Value.TryCreate(this, out resource))
+                    resource = await provider.Value.Create(this);
+                    if (resource != null)
                     {
                         // found
                         break;
@@ -98,9 +99,9 @@ namespace NuGet.Client
         /// </summary>
         /// <typeparam name="T">Expected resource type</typeparam>
         /// <returns>Null if the resource does not exist</returns>
-        public virtual async Task<T> GetResourceAsync<T>() 
+        public virtual async Task<T> GetResourceAsync<T>()
         {
-            return await Task.Run(() => GetResource<T>());
+            return await this.GetResource<T>();
         }
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace NuGet.Client
         }
 
         // TODO: improve this sort
-        private static Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>[] 
+        private static Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>[]
             Sort(IEnumerable<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>> group)
         {
             // initial ordering to help make this deterministic 
@@ -132,14 +133,14 @@ namespace NuGet.Client
 
             ProviderComparer comparer = new ProviderComparer();
 
-            var ordered = new Queue<Lazy<INuGetResourceProvider,INuGetResourceProviderMetadata>>();
+            var ordered = new Queue<Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata>>();
 
             // List.Sort does not work when lists have unsolvable gaps, which can occur here
             while (items.Count > 0)
             {
                 Lazy<INuGetResourceProvider, INuGetResourceProviderMetadata> best = items[0];
 
-                for (int i=1; i < items.Count; i++)
+                for (int i = 1; i < items.Count; i++)
                 {
                     if (comparer.Compare(items[i], best) < 0)
                     {
