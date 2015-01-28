@@ -1,11 +1,6 @@
 ﻿using NuGet.Client;
-using NuGet.Client.V2;
 using NuGet.PackagingCore;
 using NuGet.Versioning;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -21,7 +16,7 @@ namespace Client.V2Test
 
             var sourceRepo = GetSourceRepository(legacyRepo);
 
-            var resource = sourceRepo.GetResource<MetadataResource>();
+            var resource = await sourceRepo.GetResource<MetadataResource>();
 
             // Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0
 
@@ -41,7 +36,7 @@ namespace Client.V2Test
 
             var sourceRepo = GetSourceRepository(legacyRepo);
 
-            var resource = sourceRepo.GetResource<MetadataResource>();
+            var resource = await sourceRepo.GetResource<MetadataResource>();
 
             // Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0
 
@@ -59,7 +54,7 @@ namespace Client.V2Test
         {
             var sourceRepo = SourceRepository;
 
-            var resource = sourceRepo.GetResource<MetadataResource>();
+            var resource = await sourceRepo.GetResource<MetadataResource>();
 
             // Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0
 

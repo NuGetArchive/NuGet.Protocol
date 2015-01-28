@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NuGet.Client.V2
@@ -24,9 +20,8 @@ namespace NuGet.Client.V2
         }
 
         // TODO: clean up
-        public bool TryCreate(SourceRepository source, out INuGetResource resource)
+        public async Task<INuGetResource> Create(SourceRepository source)
         {
-            resource = null;
             V2PackageRepositoryResource repoResource = null;
 
             if (!_cache.TryGetValue(source.PackageSource, out repoResource))
@@ -45,11 +40,8 @@ namespace NuGet.Client.V2
                 {
                     try
                     {
-                        var task = Task.Run(async () => await V2Utilities.IsV2(source.PackageSource));
-                        task.Wait();
-
                         // if it's not in cache, then check if it is V2.
-                        if (task.Result)
+                        if (await V2Utilities.IsV2(source.PackageSource))
                         {
                             // Get a IPackageRepo object and add it to the cache.
                             repo = V2Utilities.GetV2SourceRepository(source.PackageSource);
@@ -58,8 +50,6 @@ namespace NuGet.Client.V2
                     catch (Exception)
                     {
                         // *TODOs:Do tracing and throw apppropriate exception here.
-                        resource = null;
-
                         Debug.Fail("Unable to create V2 repository on: " + source.PackageSource.Source);
                     }
                 }
@@ -73,8 +63,7 @@ namespace NuGet.Client.V2
                 _cache.TryAdd(source.PackageSource, repoResource);
             }
 
-            resource = repoResource;
-            return resource != null;
+            return repoResource;
         }
     }
 }

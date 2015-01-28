@@ -1,16 +1,10 @@
 ﻿using NuGet.Configuration;
 using NuGet.Data;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NuGet.Client
 {
-    
     [NuGetResourceProviderMetadata(typeof(DownloadResource), "V3DownloadResourceProvider", "V2DownloadResourceProvider")]
     public class V3DownloadResourceProvider : INuGetResourceProvider
     {
@@ -21,19 +15,19 @@ namespace NuGet.Client
             _cache = new ConcurrentDictionary<PackageSource, DownloadResource>();
         }
 
-        public bool TryCreate(SourceRepository source, out INuGetResource resource)
+        public async Task<INuGetResource> Create(SourceRepository source)
         {
             DownloadResource downloadResource = null;
 
-            var serviceIndex = source.GetResource<V3ServiceIndexResource>();
+            var serviceIndex = await source.GetResource<V3ServiceIndexResource>();
 
             if (serviceIndex != null)
             {
                 if (!_cache.TryGetValue(source.PackageSource, out downloadResource))
                 {
-                    var registrationResource = source.GetResource<V3RegistrationResource>();
+                    var registrationResource = await source.GetResource<V3RegistrationResource>();
 
-                    DataClient client = new DataClient(source.GetResource<HttpHandlerResource>().MessageHandler);
+                    DataClient client = new DataClient((await source.GetResource<HttpHandlerResource>()).MessageHandler);
 
                     downloadResource = new V3DownloadResource(client, registrationResource);
 
@@ -41,8 +35,7 @@ namespace NuGet.Client
                 }
             }
 
-            resource = downloadResource;
-            return downloadResource != null;
+            return downloadResource;
         }
     }
 }

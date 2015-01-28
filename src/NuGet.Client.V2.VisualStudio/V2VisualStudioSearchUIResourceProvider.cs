@@ -1,39 +1,39 @@
-﻿using System.ComponentModel.Composition;
-using NuGet.Client.VisualStudio;
+﻿using NuGet.Client.VisualStudio;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace NuGet.Client.V2.VisualStudio
-{
-    
+{    
     [NuGetResourceProviderMetadata(typeof(UISearchResource), "V2UISearchResourceProvider", NuGetResourceProviderPositions.Last)]
     public class V2UISearchResourceProvider : V2ResourceProvider
     {
         private readonly ConcurrentDictionary<Configuration.PackageSource, UISearchResource> _cache = new ConcurrentDictionary<Configuration.PackageSource,UISearchResource>();
 
-        public override bool TryCreate(SourceRepository source, out INuGetResource resource)
+        public override async Task<INuGetResource> Create(SourceRepository source)
         {
+            INuGetResource resource = null;
             UISearchResource v2UISearchResource;
             if (!_cache.TryGetValue(source.PackageSource, out v2UISearchResource))
             {
-                if (base.TryCreate(source, out resource))
+                resource = await base.Create(source);
+                if (resource != null)
                 {
 
                     v2UISearchResource = new V2UISearchResource((V2Resource)resource);
                     _cache.TryAdd(source.PackageSource, v2UISearchResource);
                     resource = v2UISearchResource;
-                    return true;
                 }
                 else
                 {
                     resource = null;
-                    return false;
                 }
             }
             else
             {
                 resource = v2UISearchResource;
-                return true;                
             }
+
+            return resource;
         }
     }
 }

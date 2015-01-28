@@ -1,4 +1,5 @@
-﻿
+﻿using System.Threading.Tasks;
+
 namespace NuGet.Client
 {
     /// <summary>
@@ -17,8 +18,7 @@ namespace NuGet.Client
         /// Attempts to create a resource for this source.
         /// </summary>
         /// <param name="source">Source repository</param>
-        /// <param name="resource">Requested resource</param>
-        /// <returns>True if this provider handles the input source</returns>
-        bool TryCreate(SourceRepository source, out INuGetResource resource);
+        /// <returns>INuGetResource object if this provider handles the input source, otherwise null</returns>
+        Task<INuGetResource> Create(SourceRepository source);
     }
 }

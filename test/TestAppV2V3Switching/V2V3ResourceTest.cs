@@ -53,7 +53,7 @@ namespace V2V3ResourcesTest
         public async Task TestDownloadResource(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
-            DownloadResource resource = repo.GetResource<DownloadResource>();
+            DownloadResource resource = await repo.GetResource<DownloadResource>();
             Assert.True(resource != null);
             Uri downloadMetadata = await resource.GetDownloadUrl(new PackageIdentity("jQuery", new NuGetVersion("1.6.4")));
             //*TODOs: Check if the download Url ends with .nupkg. More detailed verification can be added to see if the nupkg file can be fetched from the location.
@@ -66,9 +66,9 @@ namespace V2V3ResourcesTest
         public async Task TestMetadataResource(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
-            MetadataResource resource = repo.GetResource<MetadataResource>();
+            MetadataResource resource = await repo.GetResource<MetadataResource>();
             Assert.True(resource != null);
-            NuGetVersion latestVersion = await resource.GetLatestVersion("Nuget.core", true, true, CancellationToken.None);            
+            NuGetVersion latestVersion = await resource.GetLatestVersion("Nuget.core", true, true, CancellationToken.None);
             Assert.True(latestVersion.ToNormalizedString().Contains("2.8.3"));
         }
 
@@ -78,8 +78,8 @@ namespace V2V3ResourcesTest
         public async Task TestVisualStudioUIMetadataResource(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
-            UIMetadataResource resource = repo.GetResource<UIMetadataResource>();
-            Assert.True(resource != null);   
+            UIMetadataResource resource = await repo.GetResource<UIMetadataResource>();
+            Assert.True(resource != null);
             var result = await resource.GetMetadata("Microsoft.AspNet.Razor", true, true, CancellationToken.None);
             UIPackageMetadata packageMetadata = result.FirstOrDefault(
                 p => p.Identity.Version == new NuGetVersion("4.0.0-beta1"));
@@ -99,7 +99,7 @@ namespace V2V3ResourcesTest
         public async Task TestAllSearchResources(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
-            UISearchResource resource = repo.GetResource<UISearchResource>();
+            UISearchResource resource = await repo.GetResource<UISearchResource>();
             //Check if we are able to obtain a resource
             Assert.True(resource != null);
             //check if the resource is of type IVsSearch.
@@ -114,9 +114,9 @@ namespace V2V3ResourcesTest
             //check if there is atleast one result which has Id exactly as the search terms.
             Assert.True(uiSearchResults.Any(p => p.Identity.Id.Equals(SearchTerm, StringComparison.OrdinalIgnoreCase)));
 
-            PSSearchResource psResource = repo.GetResource<PSSearchResource>();
-            IEnumerable<PSSearchMetadata> psSearchResults =  await psResource.Search(SearchTerm, filter, 0, 100, new System.Threading.CancellationToken());
-            SimpleSearchResource simpleSearch = repo.GetResource<SimpleSearchResource>();
+            PSSearchResource psResource = await repo.GetResource<PSSearchResource>();
+            IEnumerable<PSSearchMetadata> psSearchResults = await psResource.Search(SearchTerm, filter, 0, 100, new System.Threading.CancellationToken());
+            SimpleSearchResource simpleSearch = await repo.GetResource<SimpleSearchResource>();
             IEnumerable<SimpleSearchMetadata> simpleSearchResults = await simpleSearch.Search(SearchTerm, filter, 0, 100, new System.Threading.CancellationToken());
             //Check that exact search results are returned irrespective of search resource ( UI, powershell and commandline).
             Assert.True(uiSearchResults.Count() == psSearchResults.Count());
@@ -129,7 +129,7 @@ namespace V2V3ResourcesTest
         public async Task TestPowerShellAutocompleteResourceForPackageIds(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
-            PSAutoCompleteResource resource = repo.GetResource<PSAutoCompleteResource>();
+            PSAutoCompleteResource resource = await repo.GetResource<PSAutoCompleteResource>();
             //Check if we are able to obtain a resource
             Assert.True(resource != null);
             IEnumerable<string> searchResults = await resource.IdStartsWith("Elmah", true, CancellationToken.None);
@@ -145,7 +145,7 @@ namespace V2V3ResourcesTest
         public async Task TestPowerShellAutocompleteResourceForPackageVersions(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
-            PSAutoCompleteResource resource = repo.GetResource<PSAutoCompleteResource>();
+            PSAutoCompleteResource resource = await repo.GetResource<PSAutoCompleteResource>();
             //Check if we are able to obtain a resource
             Assert.True(resource != null);
             // Check if non zero version count is returned. *TODOS : Use a standard test packages whose version count will be fixed
@@ -159,87 +159,87 @@ namespace V2V3ResourcesTest
         public async Task TestDependencyInfoResourceForPackageWithAnyFramework(string SourceUrl)
         {
             SourceRepository repo = GetSourceRepository(SourceUrl);
-            DepedencyInfoResource resource = repo.GetResource<DepedencyInfoResource>();
+            DepedencyInfoResource resource = await repo.GetResource<DepedencyInfoResource>();
             //Check if we are able to obtain a resource
-            Assert.True(resource != null);          
+            Assert.True(resource != null);
             List<PackageIdentity> packageIdentities = new List<PackageIdentity>();
             //Check the dependency tree depth for a known package. Since the same test executes for both V2 and V3 source, we cna also ensure that the pre-resolver data is same for both V2 and V3.
-            packageIdentities.Add(new PackageIdentity("WebGrease",new NuGetVersion("1.6.0")));
+            packageIdentities.Add(new PackageIdentity("WebGrease", new NuGetVersion("1.6.0")));
             IEnumerable<PackageDependencyInfo> packages = await resource.ResolvePackages(packageIdentities, NuGet.Frameworks.NuGetFramework.AnyFramework, true, new CancellationToken());
             Assert.True(packages.Count() >= 16);
         }
 
-       [Fact]
+        [Fact]
         public async Task TestAllBasicScenariosForLocalShare()
         {
-           
-            List<PackageIdentity> packages = new List<PackageIdentity>();        
+
+            List<PackageIdentity> packages = new List<PackageIdentity>();
             packages.Add(new PackageIdentity("Nuget.core", new NuGetVersion("2.8.3")));
             packages.Add(new PackageIdentity("Nuget.core", new NuGetVersion("2.5.0")));
 
             //create a local package source by downloading the specific packages from remote feed.
-            SetupLocalShare(packages); 
-           
-           //Create source repo based on the local share.
+            SetupLocalShare(packages);
+
+            //Create source repo based on the local share.
             SourceRepository repo = GetSourceRepository(Environment.CurrentDirectory);
-            UIMetadataResource resource = repo.GetResource<UIMetadataResource>();
+            UIMetadataResource resource = await repo.GetResource<UIMetadataResource>();
             Assert.True(resource != null);
-           
-           //check if UIPackageMetadata works fine.
-            IEnumerable<UIPackageMetadata> packageMetadataList =  resource.GetMetadata("Nuget.core", true, true, CancellationToken.None).Result;
+
+            //check if UIPackageMetadata works fine.
+            IEnumerable<UIPackageMetadata> packageMetadataList = resource.GetMetadata("Nuget.core", true, true, CancellationToken.None).Result;
             Assert.True(packageMetadataList != null);
             Assert.True(packageMetadataList.Count() == 2);
             Assert.True(packageMetadataList.All(item => item.Tags.Contains("nuget")));
             Assert.True(packageMetadataList.All(item => item.RequireLicenseAcceptance.Equals(false)));
-            Assert.True(packageMetadataList.All(item => item.ProjectUrl.ToString().Equals("http://nuget.codeplex.com/")));           
-            Assert.True(packageMetadataList.Any(item => item.DependencySets.Count() == 1)); 
-            Assert.True(packageMetadataList.First(item => item.DependencySets.Count()==1).DependencySets.First().Dependencies.Any(item2 => item2.Id.Equals("Microsoft.Web.Xdt", StringComparison.OrdinalIgnoreCase)));
+            Assert.True(packageMetadataList.All(item => item.ProjectUrl.ToString().Equals("http://nuget.codeplex.com/")));
+            Assert.True(packageMetadataList.Any(item => item.DependencySets.Count() == 1));
+            Assert.True(packageMetadataList.First(item => item.DependencySets.Count() == 1).DependencySets.First().Dependencies.Any(item2 => item2.Id.Equals("Microsoft.Web.Xdt", StringComparison.OrdinalIgnoreCase)));
 
             //Check if downloadresource works fine.
-            DownloadResource downloadResource = repo.GetResource<DownloadResource>();
-            Uri downloadUrl =  await downloadResource.GetDownloadUrl(new PackageIdentity("Nuget.core", new NuGetVersion("2.5.0")));
+            DownloadResource downloadResource = await repo.GetResource<DownloadResource>();
+            Uri downloadUrl = await downloadResource.GetDownloadUrl(new PackageIdentity("Nuget.core", new NuGetVersion("2.5.0")));
             Assert.True(downloadUrl.IsFile);
             Assert.True(File.Exists(downloadUrl.LocalPath)); //path doesnt contain the folder name and also the version is normalized in path for local scenario.
 
-           //Check if metadata resource works fine.
-            MetadataResource metadataResource = repo.GetResource<MetadataResource>();
-            NuGetVersion latestVersion = await  metadataResource.GetLatestVersion("Nuget.core", true, false, CancellationToken.None);
+            //Check if metadata resource works fine.
+            MetadataResource metadataResource = await repo.GetResource<MetadataResource>();
+            NuGetVersion latestVersion = await metadataResource.GetLatestVersion("Nuget.core", true, false, CancellationToken.None);
             Assert.True(latestVersion.ToNormalizedString().Contains("2.8.3"));
         }
 
-       [Theory]
-       [InlineData("https://nuget.org/api/v2/")]
-       [InlineData("https://api.nuget.org/v3/index.json")]     
-       public async Task TestAllResourcesForNonExistentPackage(string SourceUrl)
-       {
-           string packageId = "nonexistentpackage";
-           string version = "1.0";
-           SourceRepository repo = GetSourceRepository(SourceUrl);
+        [Theory]
+        [InlineData("https://nuget.org/api/v2/")]
+        [InlineData("https://api.nuget.org/v3/index.json")]
+        public async Task TestAllResourcesForNonExistentPackage(string SourceUrl)
+        {
+            string packageId = "nonexistentpackage";
+            string version = "1.0";
+            SourceRepository repo = GetSourceRepository(SourceUrl);
 
-           DownloadResource downloadResource = repo.GetResource<DownloadResource>();
-           Assert.True(downloadResource != null);
-           Uri downloadMetadata = await downloadResource.GetDownloadUrl(new PackageIdentity(packageId, new NuGetVersion(version)));
-           Assert.True(downloadMetadata == null);
-           
-           MetadataResource metadataResource = repo.GetResource<MetadataResource>();
-           Assert.True(metadataResource != null);
-           NuGetVersion latestVersion = await metadataResource.GetLatestVersion(packageId, true, true, CancellationToken.None);
-           Assert.True(latestVersion == null);
+            DownloadResource downloadResource = await repo.GetResource<DownloadResource>();
+            Assert.True(downloadResource != null);
+            Uri downloadMetadata = await downloadResource.GetDownloadUrl(new PackageIdentity(packageId, new NuGetVersion(version)));
+            Assert.True(downloadMetadata == null);
 
-           UIMetadataResource uiMetadataResource = repo.GetResource<UIMetadataResource>();
-           Assert.True(uiMetadataResource != null);
+            MetadataResource metadataResource = await repo.GetResource<MetadataResource>();
+            Assert.True(metadataResource != null);
+            NuGetVersion latestVersion = await metadataResource.GetLatestVersion(packageId, true, true, CancellationToken.None);
+            Assert.True(latestVersion == null);
 
-           var result = await uiMetadataResource.GetMetadata(packageId, true, true, CancellationToken.None);
-           Assert.False(result.Any());
+            UIMetadataResource uiMetadataResource = await repo.GetResource<UIMetadataResource>();
+            Assert.True(uiMetadataResource != null);
 
-           DepedencyInfoResource resource = repo.GetResource<DepedencyInfoResource>();
-           //Check if we are able to obtain a resource
-           Assert.True(resource != null);
-           List<PackageIdentity> packageIdentities = new List<PackageIdentity>();          
-           packageIdentities.Add(new PackageIdentity(packageId, new NuGetVersion(version)));
-           IEnumerable<PackageDependencyInfo> packages = await resource.ResolvePackages(packageIdentities, NuGet.Frameworks.NuGetFramework.AnyFramework, true, new CancellationToken());
-           Assert.True(packages == null || packages.Count() == 0);
-       }
+            var result = await uiMetadataResource.GetMetadata(packageId, true, true, CancellationToken.None);
+            Assert.False(result.Any());
+
+            DepedencyInfoResource resource = await repo.GetResource<DepedencyInfoResource>();
+            //Check if we are able to obtain a resource
+            Assert.True(resource != null);
+            List<PackageIdentity> packageIdentities = new List<PackageIdentity>();
+            packageIdentities.Add(new PackageIdentity(packageId, new NuGetVersion(version)));
+            IEnumerable<PackageDependencyInfo> packages = await resource.ResolvePackages(packageIdentities, NuGet.Frameworks.NuGetFramework.AnyFramework, true, new CancellationToken());
+            Assert.True(packages == null || packages.Count() == 0);
+        }
 
         #region PrivateHelpers
         private SourceRepository GetSourceRepository(string SourceUrl)
@@ -275,7 +275,7 @@ namespace V2V3ResourcesTest
                 string id = identity.Id;
                 NuGet.SemanticVersion version = new NuGet.SemanticVersion(identity.Version.ToNormalizedString());
                 new PackageManager(PackageRepositoryFactory.Default.CreateRepository(V2SourceUrl), Environment.CurrentDirectory).InstallPackage(id, version);
-            }         
+            }
         }
 
         #endregion PrivateHelpers

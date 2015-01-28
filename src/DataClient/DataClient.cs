@@ -75,18 +75,7 @@ namespace NuGet.Data
 
             return handler;
         }
-
-        /// <summary>
-        /// Retrieve a json file
-        /// </summary>
-        public JObject GetJObject(Uri address)
-        {
-            var task = GetJObjectAsync(address, CancellationToken.None);
-            task.Wait();
-
-            return task.Result;
-        }
-
+        
         /// <summary>
         /// Retrieve a json file
         /// </summary>
