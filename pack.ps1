@@ -158,6 +158,10 @@ if (!$SkipBuild)
 
 Pack("NuGet.Client.BaseTypes")
 Pack("NuGet.Client.VisualStudio")
+
+$NoLock=$True
 Pack("NuGet.Client.V3")
+$NoLock=$False
+
 Pack("NuGet.Protocol.Types")
 Pack("NuGet.Protocol")
