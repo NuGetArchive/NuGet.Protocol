@@ -13,8 +13,8 @@
     <description>NuGet's protocol-level base types used for connecting to API v2 and API v3 repositories.</description>
     <tags>nuget protocol client</tags>
     <dependencies>
-      <dependency id="NuGet.Client.VisualStudio" version="$version$" />
-      <dependency id="NuGet.Client.BaseTypes" version="$version$" />
+      <dependency id="NuGet.Client.VisualStudio" version="$Version_NuGet_Client_VisualStudio$" />
+      <dependency id="NuGet.Client.BaseTypes" version="$Version_NuGet_Client_BaseTypes$" />
     </dependencies>
   </metadata>
   <files />

@@ -10,7 +10,7 @@ param (
     [switch]$NoLock
 )
 
-function Pack([string]$Id)
+function Pack([string]$Id, [string]$Properties)
 {
     # assembly containing the release file version to use for the package
     $workingDir = (Get-Item -Path ".\" -Verbose).FullName;
@@ -87,14 +87,26 @@ function Pack([string]$Id)
         New-Item -ItemType directory -Path nupkgs | Out-Null
     }
 
-    # Pack
+    # Pack	
 	if($projectPath.EndsWith(".nuspec")) {
-		Write-Host ".\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version" -ForegroundColor Cyan
-		.\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version
+		if($Properties) {
+			Write-Host ".\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version -Properties $Properties" -ForegroundColor Cyan
+			.\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version -Properties $Properties
+		}
+		else {
+			Write-Host ".\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version" -ForegroundColor Cyan
+			.\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version
+		}		
 	}
 	else {
-		Write-Host ".\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version" -ForegroundColor Cyan
-		.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version
+		if($Properties) {
+			Write-Host ".\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version -Properties $Properties" -ForegroundColor Cyan
+			.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version -Properties $Properties
+		}
+		else {
+			Write-Host ".\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version" -ForegroundColor Cyan
+			.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version
+		}		
 	}
 	
     # Find the path of the nupkg we just built
@@ -118,6 +130,8 @@ function Pack([string]$Id)
     {
         Write-Warning "Package not uploaded. Specify -PushTarget to upload this package"
     }
+	
+	$global:ProducedVersion = "$version"
 }
 
 # build
@@ -156,8 +170,17 @@ if (!$SkipBuild)
     }
 }
 
-Pack("NuGet.Client.BaseTypes")
-Pack("NuGet.Client.VisualStudio")
-Pack("NuGet.Client.V3")
-Pack("NuGet.Protocol.Types")
-Pack("NuGet.Protocol")
+
+Pack "NuGet.Client.BaseTypes"
+$global:Version_NuGet_Client_BaseTypes = "$global:ProducedVersion"
+
+Pack "NuGet.Client.VisualStudio"
+$global:Version_NuGet_Client_VisualStudio = "$global:ProducedVersion"
+
+Pack "NuGet.Client.V3" "Version_NuGet_Client_BaseTypes=$global:Version_NuGet_Client_BaseTypes"
+$global:Version_NuGet_Client_V3 = "$global:ProducedVersion"
+
+Pack "NuGet.Protocol.Types" "Version_NuGet_Client_VisualStudio=$global:Version_NuGet_Client_VisualStudio;Version_NuGet_Client_BaseTypes=$global:Version_NuGet_Client_BaseTypes"
+$global:Version_NuGet_Protocol_Types = "$global:ProducedVersion"
+
+Pack "NuGet.Protocol" "Version_NuGet_Protocol_Types=$global:Version_NuGet_Protocol_Types;Version_NuGet_Client_V3=$global:Version_NuGet_Client_V3"
