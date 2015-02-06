@@ -112,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="NuGet.Client.V3.nuspec" />
     <None Include="NuGet.Protocol.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

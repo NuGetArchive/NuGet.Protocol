@@ -156,5 +156,6 @@ if (!$SkipBuild)
 
 Pack("NuGet.Client.BaseTypes")
 Pack("NuGet.Client.VisualStudio")
+Pack("NuGet.Client.V3")
 Pack("NuGet.Protocol.Types")
 Pack("NuGet.Protocol")
