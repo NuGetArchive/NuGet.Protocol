@@ -4,10 +4,13 @@
     <id>NuGet.Client.VisualStudio</id>
     <version>1.0.0-changeme</version>
     <title>NuGet.Client.VisualStudio</title>
+    <description>NuGet v3.0.0 VisualStudio types</description>
     <authors>NuGet</authors>
+    <copyright>Copyright Outercurve Foundation. All rights reserved.</copyright>
     <owners>NuGet</owners>
+    <projectUrl>https://github.com/NuGet/NuGet.Protocol/</projectUrl>
+    <licenseUrl>https://raw.githubusercontent.com/NuGet/NuGet.Protocol/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>NuGet v3.0.0 visual studio types</description>
-    <projectUrl>https://github.com/NuGet/NuGet.Client.V3/</projectUrl>
+    <tags>nuget client visualstudio</tags>
   </metadata>
 </package>

@@ -147,5 +147,6 @@ if (!$SkipBuild)
     }
 }
 
+Pack("NuGet.Client.VisualStudio")
 Pack("NuGet.Protocol.Types")
 Pack("NuGet.Protocol")

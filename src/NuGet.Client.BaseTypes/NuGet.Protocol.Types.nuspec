@@ -12,9 +12,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>NuGet's protocol-level base types used for connecting to API v2 and API v3 repositories.</description>
     <tags>nuget protocol client</tags>
+    <dependencies>
+      <dependency id="NuGet.Client.VisualStudio" version="$version$" />
+    </dependencies>
   </metadata>
-   <files>
-	<file src="..\NuGet.Client.VisualStudio\bin\$configuration$\NuGet.Client.VisualStudio.dll" target="lib/net45" />
-	<file src="..\NuGet.Client.VisualStudio\bin\$configuration$\NuGet.Client.VisualStudio.XML" target="lib/net45" />
-  </files>
 </package>

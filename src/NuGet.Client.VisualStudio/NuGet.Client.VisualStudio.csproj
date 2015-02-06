@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="NuGet.Client.VisualStudio.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
