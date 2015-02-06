@@ -30,10 +30,12 @@ function Pack([string]$Id)
     Write-Host "Target: $primaryAssemblyPath"
 
     # check signature
-    Write-Host "Signature check" -ForegroundColor Cyan
-    $snPath = Join-Path ${env:ProgramFiles(x86)} "Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\x64\sn.exe"
-    Start-Process $snPath "-Tp $primaryAssemblyPath" -Wait -NoNewWindow
-
+	if(!$projectPath.EndsWith(".nuspec")) {
+		Write-Host "Signature check" -ForegroundColor Cyan
+		$snPath = Join-Path ${env:ProgramFiles(x86)} "Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools\x64\sn.exe"
+		Start-Process $snPath "-Tp $primaryAssemblyPath" -Wait -NoNewWindow
+	}
+	
     # find the current git branch
     $gitBranch = "ci"
 
@@ -86,8 +88,13 @@ function Pack([string]$Id)
     }
 
     # Pack
-    .\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version
-
+	if($projectPath.EndsWith(".nuspec")) {
+		.\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version
+	}
+	else {
+		.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version
+	}
+	
     # Find the path of the nupkg we just built
     $nupkgPath = Get-ChildItem .\nupkgs -filter "$Id.$version.nupkg" | % { $_.FullName }
 
@@ -147,6 +154,7 @@ if (!$SkipBuild)
     }
 }
 
+Pack("NuGet.Client.BaseTypes")
 Pack("NuGet.Client.VisualStudio")
 Pack("NuGet.Protocol.Types")
 Pack("NuGet.Protocol")

@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="NuGet.Client.BaseTypes.nuspec" />
     <None Include="NuGet.Protocol.Types.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

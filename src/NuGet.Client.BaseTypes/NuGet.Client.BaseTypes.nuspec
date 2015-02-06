@@ -1,20 +1,16 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
-    <id>NuGet.Protocol.Types</id>
+    <id>NuGet.Client.BaseTypes</id>
     <version>1.0.0-changeme</version>
-    <title>NuGet's protocol client types</title>
+    <title>NuGet's protocol client base types</title>
     <authors>NuGet</authors>
     <copyright>Copyright Outercurve Foundation. All rights reserved.</copyright>
     <owners>NuGet</owners>
     <projectUrl>https://github.com/NuGet/NuGet.Protocol/</projectUrl>
     <licenseUrl>https://raw.githubusercontent.com/NuGet/NuGet.Protocol/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>NuGet's protocol-level base types used for connecting to API v2 and API v3 repositories.</description>
+    <description>NuGet's protocol-level base types.</description>
     <tags>nuget protocol client</tags>
-    <dependencies>
-      <dependency id="NuGet.Client.VisualStudio" version="$version$" />
-      <dependency id="NuGet.Client.BaseTypes" version="$version$" />
-    </dependencies>
   </metadata>
 </package>
