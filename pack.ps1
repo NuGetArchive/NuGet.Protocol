@@ -89,9 +89,11 @@ function Pack([string]$Id)
 
     # Pack
 	if($projectPath.EndsWith(".nuspec")) {
+		Write-Host ".\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version" -ForegroundColor Cyan
 		.\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version
 	}
 	else {
+		Write-Host ".\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version" -ForegroundColor Cyan
 		.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version
 	}
 	
