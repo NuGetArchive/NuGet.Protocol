@@ -13,7 +13,7 @@
     <description>NuGet's protocol client for connecting to API v3 respositories.</description>
     <tags>nuget protocol</tags>
     <dependencies>
-      <dependency id="NuGet.Client.BaseTypes" version="$version$" />
+      <dependency id="NuGet.Client.BaseTypes" version="$DependencyVersion$" />
     </dependencies>
   </metadata>
   <files>

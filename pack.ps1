@@ -89,12 +89,12 @@ function Pack([string]$Id)
 
     # Pack
 	if($projectPath.EndsWith(".nuspec")) {
-		Write-Host ".\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version" -ForegroundColor Cyan
-		.\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version
+		Write-Host ".\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version" -ForegroundColor Cyan
+		.\.nuget\nuget.exe pack $projectPath -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version
 	}
 	else {
-		Write-Host ".\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version" -ForegroundColor Cyan
-		.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version
+		Write-Host ".\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version" -ForegroundColor Cyan
+		.\.nuget\nuget.exe pack $projectPath -Properties configuration=$Configuration -symbols -OutputDirectory nupkgs -version $version -Properties DependencyVersion=$version
 	}
 	
     # Find the path of the nupkg we just built
@@ -158,10 +158,6 @@ if (!$SkipBuild)
 
 Pack("NuGet.Client.BaseTypes")
 Pack("NuGet.Client.VisualStudio")
-
-$NoLock=$True
 Pack("NuGet.Client.V3")
-$NoLock=$False
-
 Pack("NuGet.Protocol.Types")
 Pack("NuGet.Protocol")
