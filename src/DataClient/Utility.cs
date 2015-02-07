@@ -38,6 +38,23 @@ namespace NuGet.Data
             return uri;
         }
 
+        public static Uri ApplyPackageToUriTemplate(Uri template, string id, Versioning.NuGetVersion Version)
+        {
+            var packageUrl = template.ToString()
+                .Replace("{id}", id)
+                .Replace("{version}", Version.ToNormalizedString())
+                .Replace("{id-lower}", id.ToLowerInvariant())
+                .Replace("{version-lower}", Version.ToNormalizedString().ToLowerInvariant());
+
+            Uri packageUri = null;
+            if (Uri.TryCreate(packageUrl, UriKind.Absolute, out packageUri))
+            {
+                return packageUri;
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Check if the entity url matches the root url
         /// </summary>
