@@ -77,6 +77,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DependencyInfoTests.cs" />
+    <Compile Include="DownloadResourceTests.cs" />
     <Compile Include="TestBase.cs" />
     <Compile Include="MetadataResourceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
