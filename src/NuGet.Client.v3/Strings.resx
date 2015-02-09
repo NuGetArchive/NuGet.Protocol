@@ -147,8 +147,11 @@
   <data name="Protocol_IndexMissingResourcesNode" xml:space="preserve">
     <value>Service index document is missing the 'resources' property.</value>
   </data>
-  <data name="Protocol_MissingRegistrationBase" xml:space="preserve">
-    <value>The source does not have a Registration Base Url defined!</value>
+  <data name="Protocol_MissingPackageVersionMetadataTemplateUri" xml:space="preserve">
+    <value>The source does not have a PackageVersionMetadataTemplateUri defined!</value>
+  </data>
+  <data name="Protocol_MissingResolverPackageIndexMetadataTemplateUri" xml:space="preserve">
+    <value>The source does not have a ResolverPackageIndexMetadataTemplateUri defined!</value>
   </data>
   <data name="Protocol_MissingSearchService" xml:space="preserve">
     <value>The source does not have a Search service!</value>

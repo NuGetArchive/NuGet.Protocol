@@ -15,11 +15,11 @@ namespace NuGet.Client.V3.VisualStudio
 {
     public class V3PSAutoCompleteResource : PSAutoCompleteResource
     {
-        private readonly V3RegistrationResource _regResource;
+        private readonly V3ResolverPackageIndexResource _regResource;
         private readonly V3ServiceIndexResource _serviceIndex;
         private readonly DataClient _client;
 
-        public V3PSAutoCompleteResource(DataClient client, V3ServiceIndexResource serviceIndex, V3RegistrationResource regResource)
+        public V3PSAutoCompleteResource(DataClient client, V3ServiceIndexResource serviceIndex, V3ResolverPackageIndexResource regResource)
             : base()
         {
             _regResource = regResource;

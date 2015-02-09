@@ -38,13 +38,39 @@ namespace NuGet.Data
             return uri;
         }
 
-        public static Uri ApplyPackageToUriTemplate(Uri template, string id, Versioning.NuGetVersion Version)
+        public static Uri ApplyPackageIdVersionToUriTemplate(Uri template, string id, Versioning.NuGetVersion version)
+        {
+            var packageUri = ApplyPackageIdToUriTemplate(template, id);
+
+            if (packageUri != null)
+            {
+                var versionUrl = packageUri.ToString()
+                    .Replace("{version}", version.ToNormalizedString())
+                    .Replace("{version-lower}", version.ToNormalizedString().ToLowerInvariant());
+
+                Uri versionUri = null;
+                if (Uri.TryCreate(versionUrl, UriKind.Absolute, out versionUri))
+                {
+                    return versionUri;
+                }
+            }
+
+            return null;
+        }
+
+        public static IEnumerable<Uri> ApplyPackageIdVersionToUriTemplate(IEnumerable<Uri> templates, string id, Versioning.NuGetVersion version)
+        {
+            foreach (var template in templates)
+            {
+                yield return ApplyPackageIdVersionToUriTemplate(template, id, version);
+            }
+        }
+
+        public static Uri ApplyPackageIdToUriTemplate(Uri template, string id)
         {
             var packageUrl = template.ToString()
                 .Replace("{id}", id)
-                .Replace("{version}", Version.ToNormalizedString())
-                .Replace("{id-lower}", id.ToLowerInvariant())
-                .Replace("{version-lower}", Version.ToNormalizedString().ToLowerInvariant());
+                .Replace("{id-lower}", id.ToLowerInvariant());
 
             Uri packageUri = null;
             if (Uri.TryCreate(packageUrl, UriKind.Absolute, out packageUri))
@@ -53,6 +79,14 @@ namespace NuGet.Data
             }
 
             return null;
+        }
+
+        public static IEnumerable<Uri> ApplyPackageIdToUriTemplate(IEnumerable<Uri> templates, string id)
+        {
+            foreach (var template in templates)
+            {
+                yield return ApplyPackageIdToUriTemplate(template, id);
+            }
         }
 
         /// <summary>

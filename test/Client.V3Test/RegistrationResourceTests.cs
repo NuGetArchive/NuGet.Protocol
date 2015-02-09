@@ -19,7 +19,7 @@ namespace Client.V3Test
         [Fact]
         public async Task RegistrationResource_NotFound()
         {
-            V3RegistrationResource resource = new V3RegistrationResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
 
             var package = await resource.GetPackageMetadata(new PackageIdentity("notfound23lk4j23lk432j4l", new NuGetVersion(1, 0, 99)), CancellationToken.None);
 
@@ -29,7 +29,7 @@ namespace Client.V3Test
         [Fact]
         public async Task RegistrationResource_Tree()
         {
-            V3RegistrationResource resource = new V3RegistrationResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
 
             var packages = await resource.GetPackageMetadata("ravendb.client", true, false, CancellationToken.None);
 
@@ -41,7 +41,7 @@ namespace Client.V3Test
         [Fact]
         public async Task RegistrationResource_TreeFilterOnPre()
         {
-            V3RegistrationResource resource = new V3RegistrationResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
 
             var packages = await resource.GetPackageMetadata("ravendb.client", false, false, CancellationToken.None);
 
@@ -53,7 +53,7 @@ namespace Client.V3Test
         [Fact]
         public async Task RegistrationResource_NonTree()
         {
-            V3RegistrationResource resource = new V3RegistrationResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
 
             var packagesPre = await resource.GetPackageMetadata("newtonsoft.json", true, false, CancellationToken.None);
             var packages = await resource.GetPackageMetadata("newtonsoft.json", false, false, CancellationToken.None);

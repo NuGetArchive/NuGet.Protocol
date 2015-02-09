@@ -22,7 +22,7 @@ namespace NuGet.Client
     {
         private readonly HttpClient _client;
         private readonly ConcurrentDictionary<Uri, JObject> _cache;
-        private readonly V3RegistrationResource _regResource;
+        private readonly V3ResolverPackageIndexResource _regResource;
         private static readonly VersionRange AllVersions = new VersionRange(null, true, null, true, true);
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace NuGet.Client
         /// </summary>
         /// <param name="client">Http client</param>
         /// <param name="regResource">Registration blob resource</param>
-        public V3DependencyInfoResource(HttpClient client, V3RegistrationResource regResource)
+        public V3DependencyInfoResource(HttpClient client, V3ResolverPackageIndexResource regResource)
         {
             if (client == null)
             {
@@ -82,12 +82,11 @@ namespace NuGet.Client
         private async Task<IEnumerable<PackageDependencyInfo>> GetPackagesFromRegistration(string packageId, VersionRange range, NuGetFramework projectFramework, CancellationToken token)
         {
             HashSet<PackageDependencyInfo> results = new HashSet<PackageDependencyInfo>(PackageIdentity.Comparer);
-
-            Uri uri = _regResource.GetUri(packageId);
+            JObject registrationIndex = await _regResource.GetIndex(packageId, token);
 
             try
             {
-                var regInfo = await ResolverMetadataClient.GetRegistrationInfo(_client, uri, range, projectFramework, _cache);
+                var regInfo = await ResolverMetadataClient.GetRegistrationInfo(_client, registrationIndex, range, projectFramework, _cache);
 
                 var result = await ResolverMetadataClient.GetTree(_client, regInfo, projectFramework, _cache);
 

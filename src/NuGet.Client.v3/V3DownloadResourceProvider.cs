@@ -32,7 +32,7 @@ namespace NuGet.Client
             {
                 if (!_cache.TryGetValue(source.PackageSource, out curResource))
                 {
-                    var registrationResource = await source.GetResourceAsync<V3RegistrationResource>(token);
+                    var registrationResource = await source.GetResourceAsync<V3ResolverPackageIndexResource>(token);
 
                     var messageHandlerResource = await source.GetResourceAsync<HttpHandlerResource>(token);
 

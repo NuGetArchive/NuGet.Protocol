@@ -17,10 +17,10 @@ namespace NuGet.Client
     /// </summary>
     public class V3DownloadResource : DownloadResource
     {
-        private readonly V3RegistrationResource _regResource;
+        private readonly V3ResolverPackageIndexResource _regResource;
         private readonly HttpClient _client;
 
-        public V3DownloadResource(HttpClient client, V3RegistrationResource regResource)
+        public V3DownloadResource(HttpClient client, V3ResolverPackageIndexResource regResource)
             : base()
         {
             if (client == null)

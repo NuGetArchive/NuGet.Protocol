@@ -18,7 +18,7 @@ namespace Client.V3Test
         [Fact]
         public async Task DownloadResource_NotFound()
         {
-            V3RegistrationResource reg = new V3RegistrationResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource reg = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
 
             V3DownloadResource resource = new V3DownloadResource(DataClient, reg);
 
@@ -34,7 +34,7 @@ namespace Client.V3Test
         [Fact]
         public async Task DownloadResource_Found()
         {
-            V3RegistrationResource reg = new V3RegistrationResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource reg = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
 
             V3DownloadResource resource = new V3DownloadResource(DataClient, reg);
 

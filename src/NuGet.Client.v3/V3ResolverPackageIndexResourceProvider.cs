@@ -6,28 +6,28 @@ using NuGet.Data;
 
 namespace NuGet.Client
 {
-    [NuGetResourceProviderMetadata(typeof(V3RegistrationResource), "V3RegistrationResource", NuGetResourceProviderPositions.Last)]
-    public class V3RegistrationResourceProvider : INuGetResourceProvider
+    [NuGetResourceProviderMetadata(typeof(V3ResolverPackageIndexResource), "V3ResolverPackageIndexResource", NuGetResourceProviderPositions.Last)]
+    public class V3ResolverPackageIndexResourceProvider : INuGetResourceProvider
     {
-        public V3RegistrationResourceProvider()
+        public V3ResolverPackageIndexResourceProvider()
         {
         }
 
         public async Task<Tuple<bool, INuGetResource>> TryCreate(SourceRepository source, CancellationToken token)
         {
-            V3RegistrationResource regResource = null;
+            V3ResolverPackageIndexResource regResource = null;
             var serviceIndex = await source.GetResourceAsync<V3ServiceIndexResource>(token);
 
             if (serviceIndex != null)
             {
-                Uri baseUrl = serviceIndex[ServiceTypes.RegistrationsBaseUrl].FirstOrDefault();
+                Uri[] indexUris = serviceIndex[ServiceTypes.ResolverPackageIndexMetadataTemplateUri].ToArray();
 
                 var messageHandlerResource = await source.GetResourceAsync<HttpHandlerResource>(token);
 
                 DataClient client = new DataClient(messageHandlerResource.MessageHandler);
 
                 // construct a new resource
-                regResource = new V3RegistrationResource(client, baseUrl);
+                regResource = new V3ResolverPackageIndexResource(client, indexUris);
             }
 
             return new Tuple<bool, INuGetResource>(regResource != null, regResource);

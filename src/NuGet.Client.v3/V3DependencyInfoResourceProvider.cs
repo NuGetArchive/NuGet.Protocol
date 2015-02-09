@@ -32,7 +32,7 @@ namespace NuGet.Client
 
                 DataClient client = new DataClient(messageHandlerResource.MessageHandler);
 
-                var regResource = await source.GetResourceAsync<V3RegistrationResource>(token);
+                var regResource = await source.GetResourceAsync<V3ResolverPackageIndexResource>(token);
 
                 // construct a new resource
                 curResource = new V3DependencyInfoResource(client, regResource);

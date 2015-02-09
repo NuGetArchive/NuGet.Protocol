@@ -17,10 +17,10 @@ namespace NuGet.Client
     /// </summary>
     public class V3MetadataResource : MetadataResource
     {
-        private V3RegistrationResource _regResource;
+        private V3ResolverPackageIndexResource _regResource;
         private HttpClient _client;
 
-        public V3MetadataResource(HttpClient client, V3RegistrationResource regResource)
+        public V3MetadataResource(HttpClient client, V3ResolverPackageIndexResource regResource)
             : base()
         {
             if (client == null)

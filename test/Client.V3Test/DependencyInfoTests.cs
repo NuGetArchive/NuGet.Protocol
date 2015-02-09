@@ -18,7 +18,7 @@ namespace Client.V3Test
         [Fact]
         public async Task DependencyInfo_Mvc()
         {
-            V3RegistrationResource reg = new V3RegistrationResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource reg = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
 
             V3DependencyInfoResource depResource = new V3DependencyInfoResource(DataClient, reg);
 

@@ -36,7 +36,7 @@ namespace NuGet.Client.V3.VisualStudio
 
             if (serviceIndex != null)
             {
-                var regResource = await source.GetResourceAsync<V3RegistrationResource>(token);
+                var regResource = await source.GetResourceAsync<V3ResolverPackageIndexResource>(token);
 
                 // construct a new resource
                 curResource = new V3PSAutoCompleteResource(_client, serviceIndex, regResource);

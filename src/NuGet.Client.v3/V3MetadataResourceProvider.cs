@@ -21,7 +21,7 @@ namespace NuGet.Client
         public async Task<Tuple<bool, INuGetResource>> TryCreate(SourceRepository source, CancellationToken token)
         {
             V3MetadataResource curResource = null;
-            V3RegistrationResource regResource = await source.GetResourceAsync<V3RegistrationResource>(token);
+            V3ResolverPackageIndexResource regResource = await source.GetResourceAsync<V3ResolverPackageIndexResource>(token);
 
             if (regResource != null)
             {

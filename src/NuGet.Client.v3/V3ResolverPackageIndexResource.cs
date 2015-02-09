@@ -11,78 +11,39 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace NuGet.Client
 {
     /// <summary>
     /// Registration blob reader
     /// </summary>
-    public class V3RegistrationResource : INuGetResource
+    public class V3ResolverPackageIndexResource : INuGetResource
     {
         // cache all json retrieved in this resource, the resource *should* be thrown away after the operation is done
         private readonly ConcurrentDictionary<Uri, JObject> _cache;
 
         private readonly HttpClient _client;
-        private readonly Uri _baseUrl;
+        private readonly Uri[] _indexTemplateUris;
 
         private static readonly VersionRange AllVersions = new VersionRange(null, true, null, true, true);
 
-        public V3RegistrationResource(HttpClient client, Uri baseUrl)
+        public V3ResolverPackageIndexResource(HttpClient client, Uri[] indexTemplateUris)
         {
             if (client == null)
             {
                 throw new ArgumentNullException("client");
             }
 
-            if (baseUrl == null)
+            if (indexTemplateUris == null || !indexTemplateUris.Any())
             {
-                throw new ArgumentNullException("baseUrl");
+                throw new ArgumentNullException("indexTemplateUri");
             }
 
             _client = client;
-            _baseUrl = baseUrl;
+            _indexTemplateUris = indexTemplateUris;
+
             _cache = new ConcurrentDictionary<Uri, JObject>();
-        }
-
-        /// <summary>
-        /// Constructs the URI of a registration index blob
-        /// </summary>
-        public virtual Uri GetUri(string packageId)
-        {
-            if (String.IsNullOrEmpty(packageId))
-            {
-                throw new InvalidOperationException();
-            }
-
-            return new Uri(String.Format(CultureInfo.InvariantCulture, "{0}/{1}/index.json", 
-                _baseUrl.AbsoluteUri.TrimEnd('/'), packageId.ToLowerInvariant()));
-        }
-
-        /// <summary>
-        /// Constructs the URI of a registration blob with a specific version
-        /// </summary>
-        public virtual Uri GetUri(string id, NuGetVersion version)
-        {
-            if (String.IsNullOrEmpty(id) || version == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return GetUri(new PackageIdentity(id, version));
-        }
-
-        /// <summary>
-        /// Constructs the URI of a registration blob with a specific version
-        /// </summary>
-        public virtual Uri GetUri(PackageIdentity package)
-        {
-            if (package == null || package.Id == null || package.Version == null)
-            {
-                throw new InvalidOperationException();
-            }
-
-            return new Uri(String.Format(CultureInfo.InvariantCulture, "{0}/{1}/{2}.json", _baseUrl.AbsoluteUri.TrimEnd('/'), 
-                package.Id.ToLowerInvariant(), package.Version.ToNormalizedString().ToLowerInvariant()));
         }
 
         /// <summary>
@@ -218,22 +179,38 @@ namespace NuGet.Client
         /// <summary>
         /// Returns the index.json registration page for a package.
         /// </summary>
-        public virtual async Task<JObject> GetIndex(string packageId, CancellationToken token)
+        public virtual async Task<JObject> GetIndex(string packageId, CancellationToken cancellationToken)
         {
-            Uri uri = GetUri(packageId);
+            foreach (var indexTemplateUri in _indexTemplateUris)
+            {
+                var indexUri = Utility.ApplyPackageIdToUriTemplate(indexTemplateUri, packageId);
 
-            return await GetJson(uri, token);
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        return await GetJson(indexUri, cancellationToken);
+                    }
+                    catch (Exception)
+                    {
+                        Debug.Fail("Registration Index GET failed");
+                    }
+                }
+            }
+
+            throw new NuGetProtocolException(Strings.Protocol_MissingResolverPackageIndexMetadataTemplateUri);
         }
 
         /// <summary>
         /// Retrieve and cache json safely
         /// </summary>
-        protected virtual async Task<JObject> GetJson(Uri uri, CancellationToken token)
+        protected virtual async Task<JObject> GetJson(Uri uri, CancellationToken cancellationToken)
         {
             JObject json = null;
             if (!_cache.TryGetValue(uri, out json))
             {
-                var response = await _client.GetAsync(uri, token);
+                var response = await _client.GetAsync(uri, cancellationToken);
+                var status = (int)response.StatusCode;
 
                 // ignore missing blobs
                 if (response.IsSuccessStatusCode)
@@ -241,10 +218,18 @@ namespace NuGet.Client
                     // throw on bad files
                     json = JObject.Parse(await response.Content.ReadAsStringAsync());
                 }
+                else if (status >= 400 && status < 500)
+                {
+                    // This was a request error, which generally indicates that the
+                    // package cannot be found (usually a 404 would happen here).
+                    // Cache an empty object so we don't continually retry
+                    json = new JObject();
+                }
                 else
                 {
-                    // cache an empty object so we don't continually retry
-                    json = new JObject();
+                    // Server error would fall into here
+                    // Throw in those cases because the server is unavailable
+                    throw new NuGetProtocolException(response.ReasonPhrase);
                 }
 
                 _cache.TryAdd(uri, json);

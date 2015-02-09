@@ -109,15 +109,14 @@ namespace NuGet.Client.DependencyInfo
             return obj;
         }
 
-        public static async Task<RegistrationInfo> GetRegistrationInfo(HttpClient httpClient, Uri registrationUri, VersionRange range, NuGetFramework projectTargetFramework, ConcurrentDictionary<Uri, JObject> sessionCache = null)
+        public static async Task<RegistrationInfo> GetRegistrationInfo(HttpClient httpClient, JObject index, VersionRange range, NuGetFramework projectTargetFramework, ConcurrentDictionary<Uri, JObject> sessionCache = null)
         {
             NuGetFrameworkFullComparer frameworkComparer = new NuGetFrameworkFullComparer();
             FrameworkReducer frameworkReducer = new FrameworkReducer();
-            JObject index = await LoadResource(httpClient, registrationUri, sessionCache);
 
             if (index == null)
             {
-                throw new ArgumentException(registrationUri.AbsoluteUri);
+                throw new ArgumentException("index");
             }
 
             VersionRange preFilterRange = Utils.SetIncludePrerelease(range, true);
@@ -136,7 +135,8 @@ namespace NuGet.Client.DependencyInfo
                     {
                         Uri rangeUri = item["@id"].ToObject<Uri>();
 
-                        rangeTasks.Add(LoadResource(httpClient, registrationUri, sessionCache));
+                        // This was previously requesting the registrationUri here, but I think it should have been rangeUri
+                        rangeTasks.Add(LoadResource(httpClient, rangeUri, sessionCache));
                     }
                     else
                     {
@@ -157,7 +157,7 @@ namespace NuGet.Client.DependencyInfo
             {
                 if (rangeObj == null)
                 {
-                    throw new InvalidDataException(registrationUri.AbsoluteUri);
+                    throw new InvalidDataException("Package Index exposed a Range URI that wasn't a valid range");
                 }
 
                 foreach (JObject packageObj in rangeObj["items"])

@@ -25,7 +25,8 @@ namespace NuGet.Client
         public const string SearchAutocompleteService = "SearchAutocompleteService" + TypeVersion;
         public const string SearchGalleryQueryService = "SearchGalleryQueryService" + TypeVersion;
         public const string MetricsService = "MetricsService" + TypeVersion;
-        public const string RegistrationsBaseUrl = "RegistrationsBaseUrl" + TypeVersion;
+        public const string ResolverPackageIndexMetadataTemplateUri = "ResolverPackageIndexMetadataTemplateUri" + TypeVersion;
+        public const string PackageVersionMetadataTemplateUri = "PackageVersionMetadataTemplateUri" + TypeVersion;
         public const string ReportAbuse = "ReportAbuse" + TypeVersion;
     }
 

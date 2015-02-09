@@ -14,7 +14,7 @@ namespace NuGet.Client
 
         public Uri GetReportAbuseUrl(string id, NuGetVersion version)
         {
-            return NuGet.Data.Utility.ApplyPackageToUriTemplate(_reportAbuseTemplate, id, version);
+            return NuGet.Data.Utility.ApplyPackageIdVersionToUriTemplate(_reportAbuseTemplate, id, version);
         }
     }
 }

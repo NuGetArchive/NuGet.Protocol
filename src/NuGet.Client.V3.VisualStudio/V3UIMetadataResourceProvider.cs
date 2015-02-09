@@ -34,7 +34,7 @@ namespace NuGet.Client.V3.VisualStudio
 
             if (await source.GetResourceAsync<V3ServiceIndexResource>(token) != null)
             {
-                var regResource = await source.GetResourceAsync<V3RegistrationResource>();
+                var regResource = await source.GetResourceAsync<V3ResolverPackageIndexResource>();
                 var reportAbuseResource = await source.GetResourceAsync<V3ReportAbuseResource>();
 
                 // construct a new resource
