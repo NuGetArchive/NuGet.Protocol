@@ -32,14 +32,12 @@ namespace NuGet.Client
             {
                 if (!_cache.TryGetValue(source.PackageSource, out curResource))
                 {
-                    var registrationResource = await source.GetResourceAsync<V3ResolverPackageIndexResource>(token);
-
+                    Uri[] downloadLinksTemplateUris = serviceIndex[ServiceTypes.PackageVersionDownloadLinksTemplateUri].ToArray();
                     var messageHandlerResource = await source.GetResourceAsync<HttpHandlerResource>(token);
 
                     DataClient client = new DataClient(messageHandlerResource.MessageHandler);
 
-                    curResource = new V3DownloadResource(client, registrationResource);
-
+                    curResource = new V3DownloadResource(client, downloadLinksTemplateUris);
                     _cache.TryAdd(source.PackageSource, curResource);
                 }
             }

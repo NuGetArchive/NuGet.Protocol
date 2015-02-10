@@ -25,30 +25,7 @@ namespace NuGet.Client
         /// </summary>
         public abstract Task<IEnumerable<NuGetVersion>> GetVersions(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token);
 
-        /// <summary>
-        /// True if the package exists in the source
-        /// Includes unlisted.
-        /// </summary>
-        public async Task<bool> Exists(PackageIdentity identity, CancellationToken token)
-        {
-            return await Exists(identity, true, token);
-        }
-
-        /// <summary>
-        /// True if the package exists in the source
-        /// </summary>
-        public abstract Task<bool> Exists(PackageIdentity identity, bool includeUnlisted, CancellationToken token);
-
-        public async Task<bool> Exists(string packageId, CancellationToken token)
-        {
-            return await Exists(packageId, true, false, token);
-        }
-
-        public abstract Task<bool> Exists(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token);
-
-
         public abstract Task<IEnumerable<KeyValuePair<string, NuGetVersion>>> GetLatestVersions(IEnumerable<string> packageIds, bool includePrerelease, bool includeUnlisted, CancellationToken token);
-
 
         public async Task<NuGetVersion> GetLatestVersion(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
         {

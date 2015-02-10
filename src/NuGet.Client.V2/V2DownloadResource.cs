@@ -24,36 +24,75 @@ namespace NuGet.Client.V2
         {
             V2Client = resource.V2Client;
         }
-      
+
+        public override async Task<bool> PackageExists(PackageIdentity identity, CancellationToken token)
+        {
+            bool exists = false;
+            SemanticVersion version = SemanticVersion.Parse(identity.Version.ToString());
+
+            if (V2Client is LocalPackageRepository)
+            {
+                LocalPackageRepository lrepo = V2Client as LocalPackageRepository;
+                //Using Path resolver doesnt work. It doesnt consider the subfolders present inside the source directory. Hence using PackageLookupPaths.
+                //return new Uri(Path.Combine(V2Client.Source, lrepo.PathResolver.GetPackageFileName(identity.Id, semVer)));
+                //Using version.ToString() as version.Version gives the normalized string even if the nupkg has unnormalized version in its path.
+                List<string> paths = lrepo.GetPackageLookupPaths(identity.Id, new SemanticVersion(identity.Version.ToString())).ToList();
+
+                exists = paths.Any(path => File.Exists(Path.Combine(V2Client.Source, path)));
+            }
+            else if (V2Client is UnzippedPackageRepository)
+            {
+                UnzippedPackageRepository repo = V2Client as UnzippedPackageRepository;
+
+                // only works for exact version string matches
+                if (repo.Exists(identity.Id, version))
+                {
+                    exists = true;
+                }
+                else
+                {
+                    // check for non-exact version string matches
+                    exists = repo.FindPackagesById(identity.Id).Any(p => p.Version == version);
+                }
+            }
+            else
+            {
+                // perform a normal exists check
+                exists = V2Client.Exists(identity.Id, version);
+            }
+
+            return exists;
+
+        }
+
         public override async Task<Uri> GetDownloadUrl(PackageIdentity identity, CancellationToken token)
         {
             //*TODOs: Temp implementation. Need to do erorr handling and stuff.
             if (V2Client is DataServicePackageRepository)
             {
-                    if (V2Client.Exists(identity.Id, new SemanticVersion(identity.Version.ToString())))
-                    {
-                        //TODOs:Not sure if there is some other standard way to get the Url from a dataservice repo. DataServicePackage has downloadurl property but not sure how to get it.
-                        return new Uri(Path.Combine(V2Client.Source, identity.Id + "." + identity.Version + ".nupkg"));
-                    }
-                    else
-                        return null;
+                if (V2Client.Exists(identity.Id, new SemanticVersion(identity.Version.ToString())))
+                {
+                    //TODOs:Not sure if there is some other standard way to get the Url from a dataservice repo. DataServicePackage has downloadurl property but not sure how to get it.
+                    return new Uri(Path.Combine(V2Client.Source, identity.Id + "." + identity.Version + ".nupkg"));
                 }
+                return null;
+            }
             else if (V2Client is LocalPackageRepository)
             {
                 LocalPackageRepository lrepo = V2Client as LocalPackageRepository;
-                    //Using Path resolver doesnt work. It doesnt consider the subfolders present inside the source directory. Hence using PackageLookupPaths.
-                    //return new Uri(Path.Combine(V2Client.Source, lrepo.PathResolver.GetPackageFileName(identity.Id, semVer)));
-                    //Using version.ToString() as version.Version gives the normalized string even if the nupkg has unnormalized version in its path.
-                    List<string> paths = lrepo.GetPackageLookupPaths(identity.Id, new SemanticVersion(identity.Version.ToString())).ToList();
-                    foreach (var path in paths)
+                //Using Path resolver doesnt work. It doesn't consider the subfolders present inside the source directory. Hence using PackageLookupPaths.
+                //return new Uri(Path.Combine(V2Client.Source, lrepo.PathResolver.GetPackageFileName(identity.Id, semVer)));
+                //Using version.ToString() as version.Version gives the normalized string even if the nupkg has unnormalized version in its path.
+                List<string> paths = lrepo.GetPackageLookupPaths(identity.Id, new SemanticVersion(identity.Version.ToString())).ToList();
+                foreach (var path in paths)
+                {
+                    if (File.Exists(Path.Combine(V2Client.Source, path)))
                     {
-                        if (File.Exists(Path.Combine(V2Client.Source, path)))
-                        {
-                            return new Uri(Path.Combine(V2Client.Source, path));
-                        }
+                        return new Uri(Path.Combine(V2Client.Source, path));
                     }
-                    return null;
+                }
 
+                return null;
             }
             else
             {

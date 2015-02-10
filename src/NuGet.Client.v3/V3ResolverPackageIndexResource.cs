@@ -1,17 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
-using NuGet.Data;
-using NuGet.PackagingCore;
-using NuGet.Versioning;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics;
+using Newtonsoft.Json.Linq;
+using NuGet.Data;
+using NuGet.Versioning;
 
 namespace NuGet.Client
 {
@@ -28,6 +25,11 @@ namespace NuGet.Client
 
         private static readonly VersionRange AllVersions = new VersionRange(null, true, null, true, true);
 
+        public V3ResolverPackageIndexResource(HttpClient client, Uri indexTemplateUri)
+            : this(client, new[] { indexTemplateUri })
+        {
+        }
+        
         public V3ResolverPackageIndexResource(HttpClient client, Uri[] indexTemplateUris)
         {
             if (client == null)
@@ -47,32 +49,23 @@ namespace NuGet.Client
         }
 
         /// <summary>
-        /// Returns the registration blob for the id and version
+        /// Returns inlined catalog entry items for each registration blob. Unlisted versions are filtered out.
         /// </summary>
         /// <remarks>The inlined entries are potentially going away soon</remarks>
-        public virtual async Task<JObject> GetPackageMetadata(PackageIdentity identity, CancellationToken token)
+        public virtual async Task<IEnumerable<JObject>> GetResolverMetadata(string packageId, bool includePrerelease, CancellationToken token)
         {
-            return (await GetPackageMetadata(identity.Id, new VersionRange(identity.Version, true, identity.Version, true), true, true, token)).SingleOrDefault();
+            return await GetResolverMetadata(packageId, AllVersions, includePrerelease, token);
         }
 
         /// <summary>
-        /// Returns inlined catalog entry items for each registration blob
+        /// Returns inlined catalog entry items for each registration blob. Unlisted versions are filtered out.
         /// </summary>
         /// <remarks>The inlined entries are potentially going away soon</remarks>
-        public virtual async Task<IEnumerable<JObject>> GetPackageMetadata(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
-        {
-            return await GetPackageMetadata(packageId, AllVersions, includePrerelease, includeUnlisted, token);
-        }
-
-        /// <summary>
-        /// Returns inlined catalog entry items for each registration blob
-        /// </summary>
-        /// <remarks>The inlined entries are potentially going away soon</remarks>
-        public virtual async Task<IEnumerable<JObject>> GetPackageMetadata(string packageId, VersionRange range, bool includePrerelease, bool includeUnlisted, CancellationToken token)
+        public virtual async Task<IEnumerable<JObject>> GetResolverMetadata(string packageId, VersionRange range, bool includePrerelease, CancellationToken token)
         {
             List<JObject> results = new List<JObject>();
 
-            var entries = await GetPackageEntries(packageId, includeUnlisted, token);
+            var entries = await GetPackageEntries(packageId, token);
 
             foreach (var entry in entries)
             {
@@ -86,20 +79,27 @@ namespace NuGet.Client
                     {
                         if (range.Satisfies(version) && (includePrerelease || !version.IsPrerelease))
                         {
-                            if (catalogEntry["published"] != null)
+                            bool listed = true;
+
+                            if (catalogEntry["listed"] != null)
+                            {
+                                listed = catalogEntry["listed"].ToObject<bool>();
+                            }
+                            else if (catalogEntry["published"] != null)
                             {
                                 DateTime published = catalogEntry["published"].ToObject<DateTime>();
+                                listed = (published.Year > 1901);
+                            }
 
-                                if ((published != null && published.Year > 1901) || includeUnlisted)
+                            if (listed)
+                            {
+                                // add in the download url
+                                if (entry["packageContent"] != null)
                                 {
-                                    // add in the download url
-                                    if (entry["packageContent"] != null)
-                                    {
-                                        catalogEntry["packageContent"] = entry["packageContent"];
-                                    }
-
-                                    results.Add(entry["catalogEntry"] as JObject);
+                                    catalogEntry["packageContent"] = entry["packageContent"];
                                 }
+
+                                results.Add(entry["catalogEntry"] as JObject);
                             }
                         }
                     }
@@ -112,7 +112,7 @@ namespace NuGet.Client
         /// <summary>
         /// Returns catalog:CatalogPage items
         /// </summary>
-        public virtual async Task<IEnumerable<JObject>> GetPages(string packageId, CancellationToken token)
+        protected virtual async Task<IEnumerable<JObject>> GetPages(string packageId, CancellationToken token)
         {
             List<JObject> results = new List<JObject>();
 
@@ -150,7 +150,7 @@ namespace NuGet.Client
         /// <summary>
         /// Returns all index entries of type Package within the given range and filters
         /// </summary>
-        public virtual async Task<IEnumerable<JObject>> GetPackageEntries(string packageId, bool includeUnlisted, CancellationToken token)
+        protected virtual async Task<IEnumerable<JObject>> GetPackageEntries(string packageId, CancellationToken token)
         {
             List<JObject> results = new List<JObject>();
 
@@ -166,7 +166,6 @@ namespace NuGet.Client
                     {
                         if (item["@type"] != null && StringComparer.Ordinal.Equals(item["@type"].ToString(), "Package"))
                         {
-                            // TODO: listed check
                             results.Add(item as JObject);
                         }
                     }
@@ -176,10 +175,15 @@ namespace NuGet.Client
             return results;
         }
 
+        public virtual Uri[] GetIndexUris(string packageId)
+        {
+            return Utility.ApplyPackageIdToUriTemplate(_indexTemplateUris, packageId).ToArray();
+        }
+
         /// <summary>
         /// Returns the index.json registration page for a package.
         /// </summary>
-        public virtual async Task<JObject> GetIndex(string packageId, CancellationToken cancellationToken)
+        protected virtual async Task<JObject> GetIndex(string packageId, CancellationToken cancellationToken)
         {
             foreach (var indexTemplateUri in _indexTemplateUris)
             {

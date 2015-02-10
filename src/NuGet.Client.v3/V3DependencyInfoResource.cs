@@ -89,11 +89,11 @@ namespace NuGet.Client
         private async Task<IEnumerable<PackageDependencyInfo>> GetPackagesFromRegistration(string packageId, VersionRange range, NuGetFramework projectFramework, CancellationToken token)
         {
             HashSet<PackageDependencyInfo> results = new HashSet<PackageDependencyInfo>(PackageIdentity.Comparer);
-            JObject registrationIndex = await _regResource.GetIndex(packageId, token);
+            Uri[] indexUris = _regResource.GetIndexUris(packageId);
 
             try
             {
-                var regInfo = await ResolverMetadataClient.GetRegistrationInfo(_client, registrationIndex, range, projectFramework, _cache);
+                var regInfo = await ResolverMetadataClient.GetRegistrationInfo(_client, indexUris, range, projectFramework, _cache);
 
                 var result = await ResolverMetadataClient.GetTree(_client, regInfo, projectFramework, _cache);
 

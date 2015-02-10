@@ -30,7 +30,7 @@ namespace NuGet.Client.DependencyInfo
             {
                 foreach (DependencyInfo dependencyInfo in packageInfo.Dependencies)
                 {
-                    dependencyInfo.RegistrationInfo = await GetRegistrationInfo(httpClient, dependencyInfo.RegistrationUri, dependencyInfo.Range, projectFramework, sessionCache);
+                    dependencyInfo.RegistrationInfo = await GetRegistrationInfo(httpClient, new[] { dependencyInfo.PackageIndexUri }, dependencyInfo.Range, projectFramework, sessionCache);
 
                     //ApplyFilter(dependencyInfo.RegistrationInfo, filter);
 
@@ -109,16 +109,32 @@ namespace NuGet.Client.DependencyInfo
             return obj;
         }
 
-        public static async Task<RegistrationInfo> GetRegistrationInfo(HttpClient httpClient, JObject index, VersionRange range, NuGetFramework projectTargetFramework, ConcurrentDictionary<Uri, JObject> sessionCache = null)
+        public static async Task<RegistrationInfo> GetRegistrationInfo(HttpClient httpClient, Uri[] packageIndexUris, VersionRange range, NuGetFramework projectTargetFramework, ConcurrentDictionary<Uri, JObject> sessionCache = null)
         {
+            if (packageIndexUris == null || !packageIndexUris.Any())
+            {
+                throw new ArgumentNullException("packageIndexUris");
+            }
+
             NuGetFrameworkFullComparer frameworkComparer = new NuGetFrameworkFullComparer();
             FrameworkReducer frameworkReducer = new FrameworkReducer();
 
-            if (index == null)
+            JObject index = null;
+            foreach (Uri indexUri in packageIndexUris)
             {
-                throw new ArgumentException("index");
+                index = await LoadResource(httpClient, indexUri, sessionCache);
+
+                if (index != null)
+                {
+                    break;
+                }
             }
 
+            if (index == null)
+            {
+                return null;
+            }
+            
             VersionRange preFilterRange = Utils.SetIncludePrerelease(range, true);
 
             IList<Task<JObject>> rangeTasks = new List<Task<JObject>>();
@@ -208,7 +224,7 @@ namespace NuGet.Client.DependencyInfo
                                             DependencyInfo dependencyInfo = new DependencyInfo();
                                             dependencyInfo.Id = dependencyObj["id"].ToString();
                                             dependencyInfo.Range = Utils.CreateVersionRange((string)dependencyObj["range"], range.IncludePrerelease);
-                                            dependencyInfo.RegistrationUri = dependencyObj["registration"].ToObject<Uri>();
+                                            dependencyInfo.PackageIndexUri = dependencyObj["registration"].ToObject<Uri>();
 
                                             packageInfo.Dependencies.Add(dependencyInfo);
                                         }

@@ -41,14 +41,13 @@ namespace NuGet.Client
         /// Find the latest version of the package
         /// </summary>
         /// <param name="includePrerelease">include versions with prerelease labels</param>
-        /// <param name="includeUnlisted">not implemented yet</param>
-        public override async Task<IEnumerable<KeyValuePair<string, NuGetVersion>>> GetLatestVersions(IEnumerable<string> packageIds, bool includePrerelease, bool includeUnlisted, CancellationToken token)
+        public override async Task<IEnumerable<KeyValuePair<string, NuGetVersion>>> GetLatestVersions(IEnumerable<string> packageIds, bool includePrerelease, CancellationToken token)
         {
             List<KeyValuePair<string, NuGetVersion>> results = new List<KeyValuePair<string, NuGetVersion>>();
 
             foreach (var id in packageIds)
             {
-                var catalogEntries = await _regResource.GetPackageMetadata(id, includePrerelease, includeUnlisted, token);
+                var catalogEntries = await _regResource.GetResolverMetadata(id, includePrerelease, token);
                 var allVersions = catalogEntries.Select(p => NuGetVersion.Parse(p["version"].ToString()));
 
                 // find the latest
@@ -67,22 +66,6 @@ namespace NuGet.Client
         {
             await Task.Delay(1);
             throw new NotImplementedException();
-        }
-
-        public override async Task<bool> Exists(PackageIdentity identity, bool includeUnlisted, CancellationToken token)
-        {
-            // TODO: get the url and just check the headers?
-            var metadata = await _regResource.GetPackageMetadata(identity, token);
-
-            // TODO: listed check
-            return metadata != null;
-        }
-
-        public override async Task<bool> Exists(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
-        {
-            var entries = await GetVersions(packageId, includePrerelease, includeUnlisted, token);
-
-            return entries != null && entries.Any();
         }
 
         public override async Task<IEnumerable<NuGetVersion>> GetVersions(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)

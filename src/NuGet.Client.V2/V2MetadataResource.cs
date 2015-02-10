@@ -55,49 +55,5 @@ namespace NuGet.Client.V2
                 .Select(p => new NuGetVersion(p.Version.Version, p.Version.SpecialVersion))
                 .Where(v => includePrerelease || !v.IsPrerelease).ToArray();
         }
-
-        public override async Task<bool> Exists(PackageIdentity identity, bool includeUnlisted, CancellationToken token)
-        {
-            bool exists = false;
-            SemanticVersion version = SemanticVersion.Parse(identity.Version.ToString());
-
-            if (V2Client is LocalPackageRepository)
-            {
-                LocalPackageRepository lrepo = V2Client as LocalPackageRepository;
-                //Using Path resolver doesnt work. It doesnt consider the subfolders present inside the source directory. Hence using PackageLookupPaths.
-                //return new Uri(Path.Combine(V2Client.Source, lrepo.PathResolver.GetPackageFileName(identity.Id, semVer)));
-                //Using version.ToString() as version.Version gives the normalized string even if the nupkg has unnormalized version in its path.
-                List<string> paths = lrepo.GetPackageLookupPaths(identity.Id, new SemanticVersion(identity.Version.ToString())).ToList();
-
-                exists = paths.Any(path => File.Exists(Path.Combine(V2Client.Source, path)));
-            }
-            else if (V2Client is UnzippedPackageRepository)
-            {
-                UnzippedPackageRepository repo = V2Client as UnzippedPackageRepository;
-
-                // only works for exact version string matches
-                if (repo.Exists(identity.Id, version))
-                {
-                    exists = true;
-                }
-                else
-                {
-                    // check for non-exact version string matches
-                    exists = repo.FindPackagesById(identity.Id).Any(p => p.Version == version);
-                }
-            }
-            else
-            {
-                // perform a normal exists check
-                exists = V2Client.Exists(identity.Id, version);
-            }
-
-            return exists;
-        }
-
-        public override async Task<bool> Exists(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
-        {
-            return V2Client.Exists(packageId);
-        }
     }
 }

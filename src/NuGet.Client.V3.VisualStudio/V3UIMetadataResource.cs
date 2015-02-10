@@ -38,7 +38,7 @@ namespace NuGet.Client.V3.VisualStudio
                 // find the range of versions we need
                 VersionRange range = new VersionRange(versions.First().Version, true, versions.Last().Version, true, true);
 
-                IEnumerable<JObject> metadataList = await _regResource.GetPackageMetadata(group.Key, range, true, true, token);
+                IEnumerable<JObject> metadataList = await _regResource.GetResolverMetadata(group.Key, range, true, token);
 
                 results.AddRange(metadataList.Select(item => ParseMetadata(item)));
             }
@@ -48,7 +48,7 @@ namespace NuGet.Client.V3.VisualStudio
 
         public override async Task<IEnumerable<UIPackageMetadata>> GetMetadata(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
         {
-            IEnumerable<JObject> metadataList = await _regResource.GetPackageMetadata(packageId, includePrerelease, includeUnlisted, token);
+            IEnumerable<JObject> metadataList = await _regResource.GetResolverMetadata(packageId, includePrerelease, includeUnlisted, token);
             return metadataList.Select(item => ParseMetadata(item));
         }
 

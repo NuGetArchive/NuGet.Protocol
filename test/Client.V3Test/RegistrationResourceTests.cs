@@ -14,14 +14,14 @@ namespace Client.V3Test
 {
     public class RegistrationResourceTests : TestBase
     {
-        private const string RegBaseUrl = "https://az320820.vo.msecnd.net/registrations-1/";
+        private readonly Uri ResolverPackageIndexTemplateUri = new Uri("https://api.nuget.org/v3/registrations-1/{id}/index.json");
 
         [Fact]
         public async Task RegistrationResource_NotFound()
         {
-            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, ResolverPackageIndexTemplateUri);
 
-            var package = await resource.GetPackageMetadata(new PackageIdentity("notfound23lk4j23lk432j4l", new NuGetVersion(1, 0, 99)), CancellationToken.None);
+            var package = await resource.GetResolverMetadata("notfound23lk4j23lk432j4l", includePrerelease: true, includeUnlisted: true, token: CancellationToken.None);
 
             Assert.Null(package);
         }
@@ -29,9 +29,9 @@ namespace Client.V3Test
         [Fact]
         public async Task RegistrationResource_Tree()
         {
-            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, ResolverPackageIndexTemplateUri);
 
-            var packages = await resource.GetPackageMetadata("ravendb.client", true, false, CancellationToken.None);
+            var packages = await resource.GetResolverMetadata("ravendb.client", true, false, CancellationToken.None);
 
             var results = packages.ToArray();
 
@@ -41,9 +41,9 @@ namespace Client.V3Test
         [Fact]
         public async Task RegistrationResource_TreeFilterOnPre()
         {
-            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, ResolverPackageIndexTemplateUri);
 
-            var packages = await resource.GetPackageMetadata("ravendb.client", false, false, CancellationToken.None);
+            var packages = await resource.GetResolverMetadata("ravendb.client", false, false, CancellationToken.None);
 
             var results = packages.ToArray();
 
@@ -53,10 +53,10 @@ namespace Client.V3Test
         [Fact]
         public async Task RegistrationResource_NonTree()
         {
-            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
+            V3ResolverPackageIndexResource resource = new V3ResolverPackageIndexResource(DataClient, ResolverPackageIndexTemplateUri);
 
-            var packagesPre = await resource.GetPackageMetadata("newtonsoft.json", true, false, CancellationToken.None);
-            var packages = await resource.GetPackageMetadata("newtonsoft.json", false, false, CancellationToken.None);
+            var packagesPre = await resource.GetResolverMetadata("newtonsoft.json", true, false, CancellationToken.None);
+            var packages = await resource.GetResolverMetadata("newtonsoft.json", false, false, CancellationToken.None);
 
             var results = packages.ToArray();
             var resultsPre = packagesPre.ToArray();

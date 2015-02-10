@@ -13,14 +13,12 @@ namespace Client.V3Test
 {
     public class DownloadResourceTests : TestBase
     {
-        private const string RegBaseUrl = "https://az320820.vo.msecnd.net/registrations-1/";
+        private readonly Uri DownloadLinksTemplateUri = new Uri("https://api.nuget.org/v3/registrations-1/{id-lower}/{version-lower}.json", UriKind.Absolute);
 
         [Fact]
         public async Task DownloadResource_NotFound()
         {
-            V3ResolverPackageIndexResource reg = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
-
-            V3DownloadResource resource = new V3DownloadResource(DataClient, reg);
+            V3DownloadResource resource = new V3DownloadResource(DataClient, DownloadLinksTemplateUri);
 
             var uri = await resource.GetDownloadUrl(new PackageIdentity("notfound23lk4j23lk432j4l", new NuGetVersion(1, 0, 99)), CancellationToken.None);
 
@@ -34,9 +32,7 @@ namespace Client.V3Test
         [Fact]
         public async Task DownloadResource_Found()
         {
-            V3ResolverPackageIndexResource reg = new V3ResolverPackageIndexResource(DataClient, new Uri(RegBaseUrl));
-
-            V3DownloadResource resource = new V3DownloadResource(DataClient, reg);
+            V3DownloadResource resource = new V3DownloadResource(DataClient, DownloadLinksTemplateUri);
 
             var uri = await resource.GetDownloadUrl(new PackageIdentity("newtonsoft.json", new NuGetVersion(6, 0, 4)), CancellationToken.None);
 

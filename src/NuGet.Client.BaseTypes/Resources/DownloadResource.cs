@@ -16,11 +16,15 @@ namespace NuGet.Client
             return await GetDownloadUrl(identity, CancellationToken.None);
         }
 
+        public virtual async Task<bool> PackageExists(PackageIdentity identity, CancellationToken token)
+        {
+            Uri downloadUri = await GetDownloadUrl(identity, token);
+            return downloadUri != null;
+        }
+
         public abstract Task<Uri> GetDownloadUrl(PackageIdentity identity, CancellationToken token);
 
-
         public abstract Task<Stream> GetStream(PackageIdentity identity, CancellationToken token);
-
 
         public event EventHandler<PackageProgressEventArgs> Progress;
     }

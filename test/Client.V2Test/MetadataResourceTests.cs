@@ -21,17 +21,17 @@ namespace Client.V2Test
 
             var sourceRepo = GetSourceRepository(legacyRepo);
 
-            var resource = sourceRepo.GetResource<MetadataResource>();
+            var resource = sourceRepo.GetResource<DownloadResource>();
 
             // Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506.0")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506.0")), CancellationToken.None));
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
 
-            Assert.False(await resource.Exists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506.1")), CancellationToken.None));
+            Assert.False(await resource.PackageExists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506.1")), CancellationToken.None));
         }
 
         [Fact]
@@ -41,17 +41,17 @@ namespace Client.V2Test
 
             var sourceRepo = GetSourceRepository(legacyRepo);
 
-            var resource = sourceRepo.GetResource<MetadataResource>();
+            var resource = sourceRepo.GetResource<DownloadResource>();
 
             // Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506.0")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506.0")), CancellationToken.None));
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
 
-            Assert.False(await resource.Exists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506.1")), CancellationToken.None));
+            Assert.False(await resource.PackageExists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506.1")), CancellationToken.None));
         }
 
         [Fact]
@@ -59,17 +59,17 @@ namespace Client.V2Test
         {
             var sourceRepo = SourceRepository;
 
-            var resource = sourceRepo.GetResource<MetadataResource>();
+            var resource = sourceRepo.GetResource<DownloadResource>();
 
             // Microsoft.jQuery.Unobtrusive.Validation.2.0.30506.0
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506.0")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506.0")), CancellationToken.None));
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQuery.Unobtrusive.Validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
 
-            Assert.True(await resource.Exists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
+            Assert.True(await resource.PackageExists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506")), CancellationToken.None));
 
-            Assert.False(await resource.Exists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506.1")), CancellationToken.None));
+            Assert.False(await resource.PackageExists(new PackageIdentity("Microsoft.jQUERY.Unobtrusive.validation", NuGetVersion.Parse("2.0.30506.1")), CancellationToken.None));
         }
 
         // xunit.core.2.0.0-rc1-build2826
