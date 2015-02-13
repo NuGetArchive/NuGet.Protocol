@@ -46,9 +46,9 @@ namespace NuGet.Client.V3.VisualStudio
             return results;
         }
 
-        public override async Task<IEnumerable<UIPackageMetadata>> GetMetadata(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
+        public override async Task<IEnumerable<UIPackageMetadata>> GetMetadata(string packageId, bool includePrerelease, CancellationToken token)
         {
-            IEnumerable<JObject> metadataList = await _regResource.GetResolverMetadata(packageId, includePrerelease, includeUnlisted, token);
+            IEnumerable<JObject> metadataList = await _regResource.GetResolverMetadata(packageId, includePrerelease, token);
             return metadataList.Select(item => ParseMetadata(item));
         }
 

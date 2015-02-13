@@ -23,12 +23,7 @@ namespace NuGet.Client.V2
             V2Client = resource.V2Client;
         }     
 
-        public override async Task<IEnumerable<KeyValuePair<string, bool>>> ArePackagesSatellite(IEnumerable<string> packageId, CancellationToken token)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override async Task<IEnumerable<KeyValuePair<string, NuGetVersion>>> GetLatestVersions(IEnumerable<string> packageIds, bool includePrerelease, bool includeUnlisted, CancellationToken token)
+        public override async Task<IEnumerable<KeyValuePair<string, NuGetVersion>>> GetLatestVersions(IEnumerable<string> packageIds, bool includePrerelease, CancellationToken token)
         {
             List<KeyValuePair<string, NuGetVersion>> results = new List<KeyValuePair<string, NuGetVersion>>();
             foreach (var id in packageIds)
@@ -49,9 +44,9 @@ namespace NuGet.Client.V2
             return results.AsEnumerable();
         }
 
-        public override async Task<IEnumerable<NuGetVersion>> GetVersions(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
+        public override async Task<IEnumerable<NuGetVersion>> GetVersions(string packageId, bool includePrerelease, CancellationToken token)
         {
-            return V2Client.FindPackagesById(packageId).Where(p => includeUnlisted || p.Listed)
+            return V2Client.FindPackagesById(packageId)
                 .Select(p => new NuGetVersion(p.Version.Version, p.Version.SpecialVersion))
                 .Where(v => includePrerelease || !v.IsPrerelease).ToArray();
         }

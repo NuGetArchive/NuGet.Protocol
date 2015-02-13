@@ -59,20 +59,11 @@ namespace NuGet.Client
             return results;
         }
 
-        /// <summary>
-        /// Not implemented yet
-        /// </summary>
-        public override async Task<IEnumerable<KeyValuePair<string, bool>>> ArePackagesSatellite(IEnumerable<string> packageId, CancellationToken token)
-        {
-            await Task.Delay(1);
-            throw new NotImplementedException();
-        }
-
-        public override async Task<IEnumerable<NuGetVersion>> GetVersions(string packageId, bool includePrerelease, bool includeUnlisted, CancellationToken token)
+        public override async Task<IEnumerable<NuGetVersion>> GetVersions(string packageId, bool includePrerelease, CancellationToken token)
         {
             List<NuGetVersion> results = new List<NuGetVersion>();
 
-            var entries = await _regResource.GetPackageEntries(packageId, includeUnlisted, token);
+            var entries = await _regResource.GetPackageEntries(packageId, token);
 
             foreach (var catalogEntry in entries)
             {
