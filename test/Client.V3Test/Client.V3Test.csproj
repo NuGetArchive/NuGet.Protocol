@@ -83,6 +83,7 @@
     <Compile Include="TestBase.cs" />
     <Compile Include="UIMetadataResourceTests.cs" />
     <Compile Include="UISearchTests.cs" />
+    <Compile Include="V3StatsResourceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
