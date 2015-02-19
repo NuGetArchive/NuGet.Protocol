@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,22 +7,6 @@ using NuGet.Data;
 
 namespace NuGet.Client
 {
-    public class TotalStats
-    {
-        public int UniquePackages { get; set; }
-        public int TotalPackages { get; set; }
-        public long Downloads { get; set; }
-        public List<OperationTotal> OperationTotals { get; set; }
-
-        public DateTime LastUpdateDateUtc { get; set; }
-    }
-
-    public class OperationTotal
-    {
-        public string Operation { get; set; }
-        public long Total { get; set; }
-    }
-
     /// <summary>
     /// Returns stats resource
     /// </summary>
