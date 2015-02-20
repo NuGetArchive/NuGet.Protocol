@@ -15,10 +15,10 @@ namespace NuGet.Client.V3.VisualStudio
     public class V3UIMetadataResource : UIMetadataResource
     {
         private readonly V3RegistrationResource _regResource;
-        private readonly V3ReportAbuseResouce _reportAbuseResource;
+        private readonly V3ReportAbuseResource _reportAbuseResource;
         private readonly DataClient _client;
 
-        public V3UIMetadataResource(DataClient client, V3RegistrationResource regResource, V3ReportAbuseResouce reportAbuseResource)
+        public V3UIMetadataResource(DataClient client, V3RegistrationResource regResource, V3ReportAbuseResource reportAbuseResource)
             : base()
         {
             _regResource = regResource;
@@ -63,6 +63,7 @@ namespace NuGet.Client.V3.VisualStudio
             }
 
             string id = metadata.Value<string>(Properties.PackageId);
+            string title = metadata.Value<string>(Properties.Title);
             string summary = metadata.Value<string>(Properties.Summary);
             string description = metadata.Value<string>(Properties.Description);
             string authors = GetField(metadata, Properties.Authors);
@@ -79,9 +80,15 @@ namespace NuGet.Client.V3.VisualStudio
                 _reportAbuseResource.GetReportAbuseUrl(id, Version) :
                 null;
 
+            if (String.IsNullOrEmpty(title))
+            {
+                // If no title exists, use the Id
+                title = id;
+            }
+
             return new UIPackageMetadata(
                 new PackageIdentity(id, Version),
-                summary, description, authors, owners,
+                title, summary, description, authors, owners,
                 iconUrl, licenseUrl, projectUrl, reportAbuseUrl,
                 tags, Published, dependencySets, requireLicenseAcceptance);
         }
