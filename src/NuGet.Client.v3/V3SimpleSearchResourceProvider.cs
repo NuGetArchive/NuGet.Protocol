@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,8 +24,7 @@ namespace NuGet.Client
             V3SimpleSearchResource curResource = null;
 
             var rawSearch = await source.GetResourceAsync<V3RawSearchResource>(token);
-
-            if (rawSearch != null && rawSearch is V3RawSearchResource)
+            if (rawSearch != null)
             {
                 curResource = new V3SimpleSearchResource(rawSearch);
             }
