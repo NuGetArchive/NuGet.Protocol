@@ -14,8 +14,6 @@ namespace NuGet.Client.V3.VisualStudio
 {
     public class V3UIMetadataResource : UIMetadataResource
     {
-        private static readonly IFormatProvider DefaultCulture = new System.Globalization.CultureInfo("en-US", true);
-
         private readonly V3RegistrationResource _regResource;
         private readonly V3ReportAbuseResource _reportAbuseResource;
         private readonly DataClient _client;
@@ -56,12 +54,12 @@ namespace NuGet.Client.V3.VisualStudio
 
         public UIPackageMetadata ParseMetadata(JObject metadata)
         {
-            NuGetVersion Version = NuGetVersion.Parse(metadata.Value<string>(Properties.Version));
-            string publishedStr = metadata.Value<string>(Properties.Published);
-            DateTimeOffset? Published = null;
-            if (!String.IsNullOrEmpty(publishedStr))
+            NuGetVersion version = NuGetVersion.Parse(metadata.Value<string>(Properties.Version));
+            DateTimeOffset? published = null;
+            var publishedToken = metadata[Properties.Published];
+            if (publishedToken != null)
             {
-                Published = DateTime.Parse(publishedStr, DefaultCulture);
+                published = publishedToken.ToObject<DateTimeOffset>();
             }
 
             string id = metadata.Value<string>(Properties.PackageId);
@@ -79,7 +77,7 @@ namespace NuGet.Client.V3.VisualStudio
 
             Uri reportAbuseUrl =
                 _reportAbuseResource != null ?
-                _reportAbuseResource.GetReportAbuseUrl(id, Version) :
+                _reportAbuseResource.GetReportAbuseUrl(id, version) :
                 null;
 
             if (String.IsNullOrEmpty(title))
@@ -89,10 +87,10 @@ namespace NuGet.Client.V3.VisualStudio
             }
 
             return new UIPackageMetadata(
-                new PackageIdentity(id, Version),
+                new PackageIdentity(id, version),
                 title, summary, description, authors, owners,
                 iconUrl, licenseUrl, projectUrl, reportAbuseUrl,
-                tags, Published, dependencySets, requireLicenseAcceptance);
+                tags, published, dependencySets, requireLicenseAcceptance);
         }
 
         /// <summary>
