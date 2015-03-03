@@ -136,6 +136,21 @@ namespace NuGet.Protocol
             return result;
         }
 
+        private static readonly XName _xnameSummary = XName.Get("summary", W3Atom);
+        private static readonly XName _xnameDescription = XName.Get("Description", DataServicesNS);
+        private static readonly XName _xnameIconUrl = XName.Get("IconUrl", DataServicesNS);
+        private static readonly XName _xnameLicenseUrl = XName.Get("LicenseUrl", DataServicesNS);
+        private static readonly XName _xnameProjectUrl = XName.Get("ProjectUrl", DataServicesNS);
+        private static readonly XName _xnameTags = XName.Get("Tags", DataServicesNS);
+        private static readonly XName _xnameReportAbuseUrl = XName.Get("ReportAbuseUrl", DataServicesNS);
+        private static readonly XName _xnameDependencies = XName.Get("Dependencies", DataServicesNS);
+        private static readonly XName _xnameRequireLicenseAcceptance = XName.Get("RequireLicenseAcceptance", DataServicesNS);
+        private static readonly XName _xnameDownloadCount = XName.Get("DownloadCount", DataServicesNS);
+        private static readonly XName _xnamePublished = XName.Get("Published", DataServicesNS);
+
+        private static readonly XName _xnameName = XName.Get("name", W3Atom);
+        private static readonly XName _xnameAuthor = XName.Get("author", W3Atom);
+
         private V2FeedPackageInfo ParsePackage(string id, XElement element)
         {
             var properties = element.Element(_xnameProperties);
@@ -150,25 +165,60 @@ namespace NuGet.Protocol
             NuGetVersion version = NuGetVersion.Parse(versionString);
             string downloadUrl = element.Element(_xnameContent).Attribute("src").Value;
 
-            string title = null;
-            string summary = null;
-            string authors = null;
-            string description = null;
-            string owners = null;
-            string iconUrl = null;
-            string licenseUrl = null;
-            string projectUrl = null;
-            string reportAbuseUrl = null;
-            string tags = null;
-            int downloadCount = 0;
-            bool requireLicenseAcceptance = false;
+            string title = titleElement?.Value;
+            string summary = GetValue(element, _xnameSummary);
+            string description = GetValue(properties, _xnameDescription);
+            string iconUrl = GetValue(properties, _xnameIconUrl);
+            string licenseUrl = GetValue(properties, _xnameLicenseUrl);
+            string projectUrl = GetValue(properties, _xnameProjectUrl);
+            string reportAbuseUrl = GetValue(properties, _xnameReportAbuseUrl);
+            string tags = GetValue(properties, _xnameTags);
+            string dependencies = GetValue(properties, _xnameDependencies);
+
+            string downloadCount = GetValue(properties, _xnameDownloadCount);
+            bool requireLicenseAcceptance = GetValue(properties, _xnameRequireLicenseAcceptance) == "true";
+
             DateTimeOffset? published = null;
-            IEnumerable<PackageDependencyGroup> dependencySets = Enumerable.Empty<PackageDependencyGroup>();
+
+            DateTimeOffset pubVal = DateTimeOffset.MinValue;
+            string pubString = GetValue(properties, _xnamePublished);
+            if (DateTimeOffset.TryParse(pubString, out pubVal))
+            {
+                published = pubVal;
+            }
+
+            // TODO: is this ever populated in v2?
+            IEnumerable<string> owners = null;
+
+            IEnumerable<string> authors = null;
+
+            var authorNode = element.Element(_xnameAuthor);
+            if (authorNode != null)
+            {
+                authors = authorNode.Elements(_xnameName).Select(e => e.Value);
+            }
 
             return new V2FeedPackageInfo(new PackageIdentity(identityId, version), 
                 title, summary, description, authors, owners, iconUrl, licenseUrl, 
-                projectUrl, reportAbuseUrl, tags, published, dependencySets, 
+                projectUrl, reportAbuseUrl, tags, published, dependencies, 
                 requireLicenseAcceptance, downloadUrl, downloadCount);
+        }
+
+        private static string GetValue(XElement parent, XName childName)
+        {
+            string value = null;
+
+            if (parent != null)
+            {
+                XElement child = parent.Element(childName);
+
+                if (child != null)
+                {
+                    value = child.Value;
+                }
+            }
+
+            return value;
         }
     }
 }
