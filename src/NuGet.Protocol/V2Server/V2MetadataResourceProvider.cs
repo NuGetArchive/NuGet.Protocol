@@ -1,29 +1,30 @@
-﻿//using System;
-//using System.Collections.Concurrent;
-//using System.Collections.Generic;
-//using System.ComponentModel.Composition;
-//using System.Linq;
-//using System.Text;
-//using System.Threading;
-//using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
-//namespace NuGet.Client.V2
-//{
-    
-//    [NuGetResourceProviderMetadata(typeof(MetadataResource), "V2MetadataResourceProvider", NuGetResourceProviderPositions.Last)]
-//    public class V2MetadataResourceProvider : V2ResourceProvider
-//    {
-//        public override async Task<Tuple<bool, INuGetResource>> TryCreate(SourceRepository source, CancellationToken token)
-//        {
-//            MetadataResource resource = null;
-//            var v2repo = await GetRepository(source, token);
+namespace NuGet.Protocol
+{
+    public class V2MetadataResourceProvider : ResourceProvider
+    {
+        public V2MetadataResourceProvider()
+            : base(typeof(MetadataResource), "V2MetadataResourceProvider", NuGetResourceProviderPositions.Last)
+        {
 
-//            if (v2repo != null)
-//            {
-//                resource = new V2MetadataResource(v2repo);
-//            }
+        }
 
-//            return new Tuple<bool, INuGetResource>(resource != null, resource);
-//        }
-//    }
-//}
+        public override async Task<Tuple<bool, INuGetResource>> TryCreate(SourceRepository source, CancellationToken token)
+        {
+            MetadataResource resource = null;
+            var sourceInfo = await source.GetResourceAsync<SourceInfoResource>();
+
+            if (await sourceInfo.IsServerV2())
+            {
+                var httpHandler = await source.GetResourceAsync<HttpHandlerResource>();
+
+                resource = new V2MetadataResource(new V2FeedParser(httpHandler.MessageHandler, source.PackageSource));
+            }
+
+            return new Tuple<bool, INuGetResource>(resource != null, resource);
+        }
+    }
+}

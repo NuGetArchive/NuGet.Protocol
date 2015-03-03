@@ -3,7 +3,7 @@
 //using System.Threading;
 //using System.Threading.Tasks;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
 //    /// <summary>
 //    /// Partial implementation for IResourceProvider to do the common V2 specific stuff.

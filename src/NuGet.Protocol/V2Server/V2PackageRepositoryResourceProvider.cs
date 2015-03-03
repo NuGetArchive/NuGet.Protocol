@@ -8,7 +8,7 @@
 //using System.Threading;
 //using System.Threading.Tasks;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
 //    /// <summary>
 //    /// Creates/caches IPackageRepositories

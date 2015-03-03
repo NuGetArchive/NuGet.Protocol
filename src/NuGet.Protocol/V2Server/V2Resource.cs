@@ -5,7 +5,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
 //    /// <summary>
 //    /// Represents a resource provided by a V2 server. [ Like search resource, metadata resource]

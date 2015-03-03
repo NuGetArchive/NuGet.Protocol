@@ -4,7 +4,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
 //    /// <summary>
 //    /// Allows an IPackageRepository repository to be passed in to a SourceRepository

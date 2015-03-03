@@ -7,7 +7,7 @@
 //using System.Threading;
 //using System.Threading.Tasks;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
     
 //    [NuGetResourceProviderMetadata(typeof(SimpleSearchResource), "V2SimpleSearchResourceProvider", NuGetResourceProviderPositions.Last)]

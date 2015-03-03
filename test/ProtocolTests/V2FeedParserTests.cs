@@ -17,9 +17,7 @@ namespace ProtocolTests
         [Fact]
         public async Task V2FeedParser_Basic()
         {
-            HttpClient client = new HttpClient(new TestHandler());
-
-            V2FeedParser parser = new V2FeedParser(client, "http://testsource/v2/");
+            V2FeedParser parser = new V2FeedParser(new TestHandler(), "http://testsource/v2/");
 
             var packages = await parser.FindPackagesByIdAsync("WindowsAzure.Storage", CancellationToken.None);
 
@@ -29,9 +27,7 @@ namespace ProtocolTests
         [Fact]
         public async Task V2FeedParser_FollowNextLinks()
         {
-            HttpClient client = new HttpClient(new TestHandler());
-
-            V2FeedParser parser = new V2FeedParser(client, "http://testsource/v2/");
+            V2FeedParser parser = new V2FeedParser(new TestHandler(), "http://testsource/v2/");
 
             var packages = await parser.FindPackagesByIdAsync("ravendb.client", CancellationToken.None);
 
@@ -41,9 +37,7 @@ namespace ProtocolTests
         [Fact]
         public async Task V2FeedParser_PackageInfo()
         {
-            HttpClient client = new HttpClient(new TestHandler());
-
-            V2FeedParser parser = new V2FeedParser(client, "http://testsource/v2/");
+            V2FeedParser parser = new V2FeedParser(new TestHandler(), "http://testsource/v2/");
 
             var packages = await parser.FindPackagesByIdAsync("WindowsAzure.Storage", CancellationToken.None);
 

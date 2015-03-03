@@ -10,7 +10,7 @@
 //using NuGet.Packaging.Core;
 //using System.Threading;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
 //    public class V2DownloadResource : DownloadResource
 //    {

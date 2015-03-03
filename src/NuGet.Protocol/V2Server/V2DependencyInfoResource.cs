@@ -14,7 +14,7 @@
 //using System.Collections.Concurrent;
 //using System.Diagnostics;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
 //    /// <summary>
 //    /// A V2 dependency info gatherer.

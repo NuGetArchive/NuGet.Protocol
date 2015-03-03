@@ -11,7 +11,7 @@
 //using System.Globalization;
 //using NuGet.Versioning;
 
-//namespace NuGet.Client.V2
+//namespace NuGet.Protocol
 //{
 //    public static class V2Utilities
 //    {

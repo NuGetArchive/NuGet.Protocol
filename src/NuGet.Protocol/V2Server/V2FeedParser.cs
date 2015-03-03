@@ -1,30 +1,29 @@
-﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-
+﻿using NuGet.Configuration;
+using NuGet.Packaging.Core;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Globalization;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using NuGet.Versioning;
-using System.Net.Http;
-using NuGet.Configuration;
-using System.Globalization;
-using System.Threading;
-using NuGet.Packaging.Core;
-using NuGet.Packaging;
 
 namespace NuGet.Protocol
 {
-    public class V2FeedParser
+    /// <summary>
+    /// A light weight XML parser for NuGet V2 Feeds
+    /// </summary>
+    public sealed class V2FeedParser
     {
         private const string W3Atom = "http://www.w3.org/2005/Atom";
         private const string MetadataNS = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
         private const string DataServicesNS = "http://schemas.microsoft.com/ado/2007/08/dataservices";
         private const string FindPackagesByIdFormat = "/FindPackagesById()?Id='{0}'";
 
+        // XNames used in the feed
         private static readonly XName _xnameEntry = XName.Get("entry", W3Atom);
         private static readonly XName _xnameTitle = XName.Get("title", W3Atom);
         private static readonly XName _xnameContent = XName.Get("content", W3Atom);
@@ -32,20 +31,38 @@ namespace NuGet.Protocol
         private static readonly XName _xnameProperties = XName.Get("properties", MetadataNS);
         private static readonly XName _xnameId = XName.Get("Id", DataServicesNS);
         private static readonly XName _xnameVersion = XName.Get("Version", DataServicesNS);
+        private static readonly XName _xnameSummary = XName.Get("summary", W3Atom);
+        private static readonly XName _xnameDescription = XName.Get("Description", DataServicesNS);
+        private static readonly XName _xnameIconUrl = XName.Get("IconUrl", DataServicesNS);
+        private static readonly XName _xnameLicenseUrl = XName.Get("LicenseUrl", DataServicesNS);
+        private static readonly XName _xnameProjectUrl = XName.Get("ProjectUrl", DataServicesNS);
+        private static readonly XName _xnameTags = XName.Get("Tags", DataServicesNS);
+        private static readonly XName _xnameReportAbuseUrl = XName.Get("ReportAbuseUrl", DataServicesNS);
+        private static readonly XName _xnameDependencies = XName.Get("Dependencies", DataServicesNS);
+        private static readonly XName _xnameRequireLicenseAcceptance = XName.Get("RequireLicenseAcceptance", DataServicesNS);
+        private static readonly XName _xnameDownloadCount = XName.Get("DownloadCount", DataServicesNS);
+        private static readonly XName _xnamePublished = XName.Get("Published", DataServicesNS);
+        private static readonly XName _xnameName = XName.Get("name", W3Atom);
+        private static readonly XName _xnameAuthor = XName.Get("author", W3Atom);
 
         private readonly HttpClient _httpClient;
         private readonly PackageSource _source;
         private readonly string _findPackagesByIdFormat;
 
-        public V2FeedParser(HttpClient httpClient, string sourceUrl)
-            : this(httpClient, new PackageSource(sourceUrl))
+        public V2FeedParser(HttpMessageHandler httpHandler, string sourceUrl)
+            : this(httpHandler, new PackageSource(sourceUrl))
         {
 
         }
 
-        public V2FeedParser(HttpClient httpClient, PackageSource source)
+        /// <summary>
+        /// Creates a V2 parser
+        /// </summary>
+        /// <param name="httpHandler">Message handler containing auth/proxy support</param>
+        /// <param name="source">endpoint source</param>
+        public V2FeedParser(HttpMessageHandler httpHandler, PackageSource source)
         {
-            if (httpClient == null)
+            if (httpHandler == null)
             {
                 throw new ArgumentNullException("httpClient");
             }
@@ -55,11 +72,14 @@ namespace NuGet.Protocol
                 throw new ArgumentNullException("source");
             }
 
-            _httpClient = httpClient;
+            _httpClient = new HttpClient(httpHandler);
             _source = source;
             _findPackagesByIdFormat = source.Source.TrimEnd('/') + FindPackagesByIdFormat;
         }
 
+        /// <summary>
+        /// Retrieves all packages with the given Id from a V2 feed.
+        /// </summary>
         public async Task<IEnumerable<V2FeedPackageInfo>> FindPackagesByIdAsync(string id, CancellationToken token)
         {
             if (String.IsNullOrEmpty(id))
@@ -127,6 +147,9 @@ namespace NuGet.Protocol
             return results;
         }
 
+        /// <summary>
+        /// Finds all entries on the page and parses them
+        /// </summary>
         private IEnumerable<V2FeedPackageInfo> ParsePage(XDocument doc, string id)
         {
             var result = doc.Root
@@ -136,21 +159,9 @@ namespace NuGet.Protocol
             return result;
         }
 
-        private static readonly XName _xnameSummary = XName.Get("summary", W3Atom);
-        private static readonly XName _xnameDescription = XName.Get("Description", DataServicesNS);
-        private static readonly XName _xnameIconUrl = XName.Get("IconUrl", DataServicesNS);
-        private static readonly XName _xnameLicenseUrl = XName.Get("LicenseUrl", DataServicesNS);
-        private static readonly XName _xnameProjectUrl = XName.Get("ProjectUrl", DataServicesNS);
-        private static readonly XName _xnameTags = XName.Get("Tags", DataServicesNS);
-        private static readonly XName _xnameReportAbuseUrl = XName.Get("ReportAbuseUrl", DataServicesNS);
-        private static readonly XName _xnameDependencies = XName.Get("Dependencies", DataServicesNS);
-        private static readonly XName _xnameRequireLicenseAcceptance = XName.Get("RequireLicenseAcceptance", DataServicesNS);
-        private static readonly XName _xnameDownloadCount = XName.Get("DownloadCount", DataServicesNS);
-        private static readonly XName _xnamePublished = XName.Get("Published", DataServicesNS);
-
-        private static readonly XName _xnameName = XName.Get("name", W3Atom);
-        private static readonly XName _xnameAuthor = XName.Get("author", W3Atom);
-
+        /// <summary>
+        /// Parse an entry into a V2FeedPackageInfo
+        /// </summary>
         private V2FeedPackageInfo ParsePackage(string id, XElement element)
         {
             var properties = element.Element(_xnameProperties);
@@ -204,6 +215,9 @@ namespace NuGet.Protocol
                 requireLicenseAcceptance, downloadUrl, downloadCount);
         }
 
+        /// <summary>
+        /// Retrieve an XML value safely
+        /// </summary>
         private static string GetValue(XElement parent, XName childName)
         {
             string value = null;
