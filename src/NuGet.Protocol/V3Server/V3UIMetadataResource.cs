@@ -74,6 +74,9 @@ namespace NuGet.Protocol
             IEnumerable<UIPackageDependencySet> dependencySets = (metadata.Value<JArray>(Properties.DependencyGroups) ?? Enumerable.Empty<JToken>()).Select(obj => LoadDependencySet((JObject)obj));
             bool requireLicenseAcceptance = metadata[Properties.RequireLicenseAcceptance] == null ? false : metadata[Properties.RequireLicenseAcceptance].ToObject<bool>();
 
+            // TODO: retrieve this from the matching version in search
+            int downloadCount = 0;
+
             Uri reportAbuseUrl =
                 _reportAbuseResource != null ?
                 _reportAbuseResource.GetReportAbuseUrl(id, version) :
@@ -89,7 +92,7 @@ namespace NuGet.Protocol
                 new PackageIdentity(id, version),
                 title, summary, description, authors, owners,
                 iconUrl, licenseUrl, projectUrl, reportAbuseUrl,
-                tags, published, dependencySets, requireLicenseAcceptance);
+                tags, published, dependencySets, requireLicenseAcceptance, downloadCount);
         }
 
         /// <summary>

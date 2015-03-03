@@ -10,7 +10,7 @@ namespace NuGet.Protocol
     public sealed class UIPackageMetadata
     {
         public UIPackageMetadata(PackageIdentity identity, string title, string summary, string description, string authors, string owners, Uri iconUrl, Uri licenseUrl, Uri projectUrl, Uri reportAbuseUrl,
-            string tags, DateTimeOffset? published, IEnumerable<UIPackageDependencySet> dependencySet, bool requireLicenseAccept)
+            string tags, DateTimeOffset? published, IEnumerable<UIPackageDependencySet> dependencySet, bool requireLicenseAccept, int downloadCount)
         {
             Identity = identity;
             Summary = summary;
@@ -27,6 +27,7 @@ namespace NuGet.Protocol
             DependencySets = dependencySet;
             RequireLicenseAcceptance = requireLicenseAccept;
             Title = title;
+            DownloadCount = downloadCount;
         }
 
         /// <summary>
