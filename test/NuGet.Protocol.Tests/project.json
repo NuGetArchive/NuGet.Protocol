@@ -9,7 +9,7 @@
 		"NuGet.Protocol.VisualStudio": "3.0.0-*"
 	},
 	"commands": {
-		"test": "xunit.runner.aspnet"
+		"comment_out_test": "xunit.runner.aspnet"
 		},
 		"frameworks": {
 			"dnx451": { }
